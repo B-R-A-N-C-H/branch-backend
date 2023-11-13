@@ -12,7 +12,7 @@ datasource db {
 
 model Member {
   id       String @id @default(cuid())
-  email    String
+  email    String @unique
   password String
 
   firstName String
