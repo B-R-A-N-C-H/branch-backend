@@ -10,10 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  TEACHER
+  HEAD_TEACHER
+  PRINCIPAL
+  ADMIN
+}
+
 model Member {
   id       String @id @default(cuid())
   email    String @unique
   password String
+
+  teachingLevel Int? // If they are a teacher (1,2,3)
+  role          Role?
 
   firstName String
   lastName  String
