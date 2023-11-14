@@ -43,6 +43,8 @@ export class MemberService {
       select: options?.excludePassword && {
         email: true,
         id: true,
+        role: true,
+        teachingLevel: true,
         firstName: true,
         lastName: true,
         createdAt: true,

@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { Role } from "@prisma/client";
 
 export class LoginDto {
   @IsEmail() email: string;
@@ -10,6 +11,7 @@ export type JwtPayload = {
   sub: {
     name: string,
     lastName: string,
+    role?: Role | null
   }
 }
 

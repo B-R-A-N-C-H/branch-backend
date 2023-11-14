@@ -25,7 +25,7 @@ export class AuthService {
     const member = await this.validateMember(dto);
     const payload: JwtPayload = {
       username: member.email,
-      sub: { name: member.firstName, lastName: member.lastName }
+      sub: { name: member.firstName, lastName: member.lastName, role: member.role }
     };
 
     return {
