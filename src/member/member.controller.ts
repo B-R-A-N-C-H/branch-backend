@@ -21,7 +21,7 @@ export class MemberController {
     );
   }
 
-  @Protected(Role.ADMIN, Role.PRINCIPAL)
+  @Protected(Role.ADMIN, Role.PRINCIPAL) // Only users with the ADMIN or PRINCIPAL role will be able to access this route
   @Patch(":id")
   async updateMember(@AuthenticatedUser() authUser: JwtPayload, @Param("id") id: string, @Body() dto: UpdateMemberDto) {
     return this.memberService.updateMember(authUser, id, dto);
