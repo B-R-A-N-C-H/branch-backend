@@ -4,7 +4,7 @@ import { AuthenticatedUser } from "../auth/guards/auth-user.decorator";
 import { JwtPayload } from "../auth/dto/auth.dto";
 import { MemberService } from "./member.service";
 
-@Controller("member")
+@Controller("members")
 export class MemberController {
 
   constructor(private memberService: MemberService) {

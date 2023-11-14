@@ -6,6 +6,11 @@ import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { Config } from "../utils/config/configuration";
 
+/**
+ * The TTL for a token in milliseconds.
+ */
+const MAX_TOKEN_AGE = 24 * 60 * 60 * 1000;
+
 @Injectable()
 export class AuthService {
 
@@ -27,13 +32,14 @@ export class AuthService {
       member,
       backendTokens: {
         accessToken: await this.jwtService.signAsync(payload, {
-          expiresIn: "1h",
+          expiresIn: "1d",
           secret: this.configService.get("JWT_SECRET")
         }),
         refreshToken: await this.jwtService.signAsync(payload, {
           expiresIn: "7d",
           secret: this.configService.get("JWT_REFRESH_TOKEN_KEY")
-        })
+        }),
+        expiresIn: new Date().setTime(Date.now() + MAX_TOKEN_AGE)
       }
     };
 
@@ -53,13 +59,14 @@ export class AuthService {
 
     return {
       accessToken: await this.jwtService.signAsync(payload, {
-        expiresIn: "1h",
+        expiresIn: "1d",
         secret: this.configService.get("JWT_SECRET")
       }),
       refreshToken: await this.jwtService.signAsync(payload, {
         expiresIn: "7d",
         secret: this.configService.get("JWT_REFRESH_TOKEN_KEY")
-      })
+      }),
+      expiresIn: new Date().setTime(Date.now() + MAX_TOKEN_AGE)
     };
   }
 

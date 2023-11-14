@@ -6,7 +6,7 @@ import { Config } from "../../utils/config/configuration";
 import { JwtPayload } from "../dto/auth.dto";
 
 @Injectable()
-export class Refresh implements CanActivate {
+export class RefreshGuard implements CanActivate {
 
   constructor(
     private jwtService: JwtService,

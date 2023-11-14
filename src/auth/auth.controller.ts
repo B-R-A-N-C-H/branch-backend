@@ -5,6 +5,7 @@ import { JwtPayload, LoginDto } from "./dto/auth.dto";
 import { AuthService } from "./auth.service";
 import { AuthenticatedUser } from "./guards/auth-user.decorator";
 import { JwtGuard } from "./guards/jwt.guard";
+import { RefreshGuard } from "./guards/refresh.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -25,7 +26,7 @@ export class AuthController {
     return await this.authService.login(dto);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(RefreshGuard)
   @Post("refresh")
   async refreshToken(@AuthenticatedUser() user: JwtPayload) {
     return this.authService.refreshToken(user);

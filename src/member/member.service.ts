@@ -18,7 +18,7 @@ export class MemberService {
     });
 
     if (existingUser)
-      throw new ConflictException("There is already a user with that email!");
+      throw new ConflictException("An account with that email already exists!");
 
     const salt = await genSalt(12);
     const hashedPassword = await hash(dto.password, salt);
@@ -40,7 +40,7 @@ export class MemberService {
       where: {
         email: dto.email.toLowerCase()
       },
-      select: options.excludePassword && {
+      select: options?.excludePassword && {
         email: true,
         id: true,
         firstName: true,

@@ -15,6 +15,12 @@ async function bootstrap() {
     })
   );
 
+  app.enableCors({
+    allowedHeaders: ["content-type", "authorization"],
+    credentials: true,
+    origin: process.env.CORS_ALLOWED_ORIGINS.split(",")
+  });
+
   await app.listen(configuration().PORT);
 
 
