@@ -1,21 +1,20 @@
-import { Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
-import { MemberService } from '../member/member.service';
-import { AuthService } from '../auth/auth.service';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {CommunicationService} from './communication.service';
 import { Role } from '@prisma/client';
 import Protected from '../auth/guards/protected.decorator';
+import { updateEventDto } from './dto/communication.dto';
 
 
 @Controller('communication')
 export class CommunicationController {
 
-  constructor() {
+  constructor(private communicationService: CommunicationService) {
   }
 
   @Protected(Role.PRINCIPAL, Role.HEAD_TEACHER, Role.ADMIN)
   @Patch("events/:id")
-  async updateEvent(@Param('id') id: string) {
-    //service impl here
-    return "event updated";
+  async updateEvent(@Param('id') id: string, @Body() dto: updateEventDto ) {
+    return this.communicationService.updateEvent(id, dto)
   }
 
   @Protected(Role.PRINCIPAL, Role.HEAD_TEACHER, Role.ADMIN)
