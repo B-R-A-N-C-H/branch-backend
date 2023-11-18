@@ -25,9 +25,8 @@ export class CommunicationController {
 
   @Protected(Role.PRINCIPAL, Role.HEAD_TEACHER, Role.ADMIN)
   @Delete("events/:id")
-  //service impl here
-  deleteEvent(@Param('id') id: string): string {
-    return "event deleted";
+  async deleteEvent(@Param('id') id: string) {
+    return this.communicationService.deleteEvent(id)
   }
 
   @Protected()
