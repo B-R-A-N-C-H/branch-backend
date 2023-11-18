@@ -37,9 +37,8 @@ export class CommunicationController {
 
   @Protected()
   @Get("events")
-  //service impl here
-  getEvents(): string {
-    return "events";
+  async getAllEvents() {
+    return this.communicationService.getAllEvents()
   }
 
   @Protected()

@@ -66,4 +66,8 @@ export class CommunicationService {
     return event;
   }
 
+  async getAllEvents() {
+    return this.prisma.event.findMany();
+  }
+
 }
