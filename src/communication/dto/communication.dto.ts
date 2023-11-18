@@ -18,3 +18,14 @@ export class updateEventDto{
    @IsDateString()
    readonly ends?: Date;
 }
+
+export class createEventDto{
+    @IsString() @IsNotEmpty()
+    name: string;
+
+    @IsDateString()
+    starts: Date;
+
+    @IsDateString()
+    ends: Date;
+}

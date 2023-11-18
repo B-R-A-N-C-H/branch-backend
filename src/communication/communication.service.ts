@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import {PrismaService} from '../utils/database/prisma.service';
-import {updateEventDto} from './dto/communication.dto';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../utils/database/prisma.service';
+import { createEventDto, updateEventDto } from './dto/communication.dto';
 
 @Injectable()
 export class CommunicationService {
@@ -24,4 +24,15 @@ export class CommunicationService {
       data: dto,
     });
   }
+
+  async createEvent(dto: createEventDto) {
+    try {
+      return await this.prisma.event.create({
+        data: dto,
+      });
+    } catch (error) {
+      throw new BadRequestException('Failed to create the event. Details: ' + error.message);
+    }
+  }
+
 }
