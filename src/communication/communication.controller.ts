@@ -32,9 +32,8 @@ export class CommunicationController {
 
   @Protected()
   @Get("events/:id")
-  //service impl here
-  getEvent(): string {
-    return "event";
+  async getEvent(@Param('id') id: string) {
+    return this.communicationService.getEvent(id)
   }
 
   @Protected()

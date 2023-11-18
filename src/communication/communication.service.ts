@@ -35,4 +35,18 @@ export class CommunicationService {
     }
   }
 
+  async getEvent(eventId: string) {
+    const event = await this.prisma.event.findUnique({
+      where: {
+        id: eventId,
+      },
+    });
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
+    return event;
+  }
+
 }
