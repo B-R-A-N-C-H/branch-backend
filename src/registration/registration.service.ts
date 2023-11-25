@@ -53,7 +53,6 @@ export class RegistrationService {
                     ]
                 }
             })
-            console.log(existingPeriod)
             if (existingPeriod)
                 throw new ConflictException("A registration period in that range already exists!");
 
@@ -63,6 +62,13 @@ export class RegistrationService {
         } catch (error) {
             throw new BadRequestException("Failed to create period. Details: ", error.message);
         }
+    }
+
+    async getAllRegistrationPeriods(/*authUser: JwtPayload*/) {
+        const periods = await this.prisma.registrationPeriod.findMany()
+        if (!periods.length)
+            throw new Error("There are no registration periods")
+        return periods
     }
 
 }
