@@ -29,3 +29,21 @@ export class createEventDto{
     @IsDateString()
     ends: Date;
 }
+
+export class createAnnouncementCommentDto {
+  @IsString()
+  @IsNotEmpty()
+  content: string;
+
+  @IsString()
+  @IsNotEmpty()
+  announcementId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  commenterId: string;
+
+  @IsString()
+  @IsOptional()
+  parentCommentId?: string;
+}

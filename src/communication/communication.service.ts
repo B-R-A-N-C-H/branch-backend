@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../utils/database/prisma.service';
-import { createEventDto, updateEventDto } from './dto/communication.dto';
+import { createEventDto, updateEventDto, createAnnouncementCommentDto } from './dto/communication.dto';
 
 @Injectable()
 export class CommunicationService {
@@ -70,4 +70,102 @@ export class CommunicationService {
     return this.prisma.event.findMany();
   }
 
+  async deleteAnnouncementComment(announcementId: string, commentId: string) {
+    const announcement = await this.prisma.announcement.findUnique({
+      where: {
+        id: announcementId,
+      },
+    });
+
+    if (!announcement) {
+      throw new NotFoundException('Announcement not found');
+    }
+
+    return this.prisma.announcement.delete({
+      where: {
+        id: commentId,
+      },
+    });
+  }
+
+  async createAnnouncementComment(id: string, dto: createAnnouncementCommentDto) {
+    try {
+      return await this.prisma.announcementComment.create({
+        data: {
+          content: dto.content,
+          announcementId: dto.announcementId,
+          commenterId: dto.commenterId,
+          //include the parentCommentId if it exists in the DTO
+          ...(dto.parentCommentId && { parentCommentId: dto.parentCommentId }),
+        }
+      });
+    } catch (error) {
+      throw new BadRequestException('Failed to create the comment. Details: ' + error.message);
+    }
+  }
+
+  async deleteAnnouncement(announcementId: string) {
+    const announcement = await this.prisma.announcement.findUnique({
+      where: {
+        id: announcementId,
+      },
+    });
+
+    if (!announcement) {
+      throw new NotFoundException('Announcement not found');
+    }
+
+    return this.prisma.announcement.delete({
+      where: {
+        id: announcementId,
+      },
+    });
+  }
+
+  async updateAnnouncement(announcementId: string, dto: any) {
+    const announcement = await this.prisma.announcement.findUnique({
+      where: {
+        id: announcementId,
+      },
+    });
+
+    if (!announcement) {
+      throw new NotFoundException('Announcement not found');
+    }
+
+    return this.prisma.announcement.update({
+      where: {
+        id: announcementId,
+      },
+      data: dto,
+    });
+  }
+
+  async createAnnouncement(dto: any) {
+    try {
+      return await this.prisma.announcement.create({
+        data: dto,
+      });
+    } catch (error) {
+      throw new BadRequestException('Failed to create the announcement. Details: ' + error.message);
+    }
+  }
+
+  async getAnnouncement(announcementId: string) {
+    const announcement = await this.prisma.announcement.findUnique({
+      where: {
+        id: announcementId,
+      },
+    });
+
+    if (!announcement) {
+      throw new NotFoundException('Announcement not found');
+    }
+
+    return announcement;
+  }
+
+  async getAllAnnouncements() {
+    return this.prisma.announcement.findMany();
+  }
 }

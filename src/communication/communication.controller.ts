@@ -43,50 +43,43 @@ export class CommunicationController {
 
   @Protected()
   @Delete("announcements/:id/comments/:commentId")
-  //service impl here
-  deleteComment(@Param('id') id: string, @Param('commentId') commentId: string): string {
-    return "comment deleted";
+  async deleteAnnouncementComment(@Param('id') id: string, @Param('commentId') commentId: string) {
+    return this.communicationService.deleteAnnouncementComment(id, commentId);
   }
 
   @Protected()
   @Post("announcements/:id/comments")
-  //service impl here
-  createComment(@Param('id') id: string): string {
-    return "comment created";
+  async createAnnouncementComment(@Param('id') id: string, @Body() dto: any) {
+    return this.communicationService.createAnnouncementComment(id, dto);
   }
 
   @Protected(Role.HEAD_TEACHER, Role.TEACHER, Role.PRINCIPAL, Role.ADMIN)
   @Delete("announcements/:id")
-  //service impl here
-  deleteAnnouncement(@Param('id') id: string): string {
-    return "announcement deleted";
+  async deleteAnnouncement(@Param('id') id: string) {
+    return this.communicationService.deleteAnnouncement(id);
   }
 
   @Protected(Role.PRINCIPAL, Role.HEAD_TEACHER, Role.TEACHER, Role.ADMIN)
   @Patch("announcements/:id")
-  //service impl here
-  updateAnnouncement(@Param('id') id: string): string {
-    return "announcement updated";
+  async updateAnnouncement(@Param('id') id: string, @Body() dto: any) {
+    return this.communicationService.updateAnnouncement(id, dto);
   }
 
   @Protected(Role.PRINCIPAL, Role.HEAD_TEACHER, Role.TEACHER, Role.ADMIN)
   @Post("announcements")
-  //service impl here
-  createAnnouncement(): string {
-    return "announcement created";
+  async createAnnouncement(@Body() dto: any) {
+    return this.communicationService.createAnnouncement(dto);
   }
 
   @Protected()
   @Get("announcements/:id")
-  //service impl here
-  getAnnouncement(@Param('id') id: string): string {
-    return "announcement";
+  async getAnnouncement(@Param('id') id: string) {
+    return this.communicationService.getAnnouncement(id);
   }
 
   @Protected()
   @Get("announcements")
-  //service impl here
-  getAnnouncements(): string {
-    return "announcements";
+  async getAllAnnouncements() {
+    return this.communicationService.getAllAnnouncements();
   }
 }
