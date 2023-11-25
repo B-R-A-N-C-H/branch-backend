@@ -1,18 +1,18 @@
 import { Type } from "class-transformer"
-import { IsDate, IsNotEmpty, IsString } from "class-validator"
+import { IsDate, IsNotEmpty, IsNumber, IsPhoneNumber, isPhoneNumber, IsString } from "class-validator"
 
 
 
 export class CreateRegistrationDto {
-    gradeLevel: number
-    childFirstName: string
-    childLastName: string
-    childDateofBirth: Date
-    streetName: string
-    city: string
-    parish: string
-    emergencyContactNumber: string
-    secondaryEmergencyContactNumber?: string
+    @IsNumber() gradeLevel: number
+    @IsString() childFirstName: string
+    @IsString() childLastName: string
+    @IsString() childDateOfBirth: Date
+    @IsString() streetName: string
+    @IsString() city: string
+    @IsString() parish: string
+    @IsString() @IsPhoneNumber("JM") emergencyContactNumber: string
+    @IsString() @IsPhoneNumber("JM") secondaryEmergencyConctactNumber?: string
 }
 
 export class CreateRegistrationPeriodDto {

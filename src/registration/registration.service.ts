@@ -11,6 +11,22 @@ export class RegistrationService {
 
     async createRegistration(authUser: JwtPayload, dto: CreateRegistrationDto) {
         //Implement Code
+        const currentDate = new Date()
+        const regPeriod = await this.prisma.registrationPeriod.findFirst({
+            where: {
+                starts:{
+                    lte: currentDate
+                },
+                ends:{
+                    gte: currentDate
+                }
+            }
+        })
+        if (!regPeriod)
+            throw new Error("Registration is not open!") 
+        return this.prisma.registrationEntry.create({
+            data: {...dto, memberId:authUser.sub.id, registrationPeriodId:regPeriod.id}
+        })
     }
 
     async createRegistrationPeriod(authUser: JwtPayload, dto: CreateRegistrationPeriodDto) {
