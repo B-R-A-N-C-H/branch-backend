@@ -4,6 +4,7 @@ import { MemberModule } from "./member/member.module";
 import { AuthModule } from "./auth/auth.module";
 import configuration from "./utils/config/configuration";
 import { PrismaService } from "./utils/database/prisma.service";
+import { RegistrationModule } from './registration/registration.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -11,7 +12,8 @@ import { PrismaService } from "./utils/database/prisma.service";
     isGlobal: true
   }),
     MemberModule,
-    AuthModule
+    AuthModule,
+    RegistrationModule,
   ],
   providers: [PrismaService]
 })
