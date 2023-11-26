@@ -14,18 +14,18 @@ export class RegistrationService {
         const currentDate = new Date()
         const regPeriod = await this.prisma.registrationPeriod.findFirst({
             where: {
-                starts:{
+                starts: {
                     lte: currentDate
                 },
-                ends:{
+                ends: {
                     gte: currentDate
                 }
             }
         })
         if (!regPeriod)
-            throw new Error("Registration is not open!") 
+            throw new BadRequestException("Registration is not open!")
         return this.prisma.registrationEntry.create({
-            data: {...dto, memberId:authUser.sub.id, registrationPeriodId:regPeriod.id}
+            data: { ...dto, memberId: authUser.sub.id, registrationPeriodId: regPeriod.id }
         })
     }
 
@@ -68,18 +68,27 @@ export class RegistrationService {
     async getAllRegistrationPeriods(authUser: JwtPayload) {
         const periods = await this.prisma.registrationPeriod.findMany()
         if (!periods.length)
-            throw new Error("There are no registration periods")
+            throw new BadRequestException("There are no registration periods")
         return periods
     }
 
-    async getRegistrationPeriod(authUser: JwtPayload, regId: string) {
+    async getRegistrationPeriod(/*authUser: JwtPayload,*/ regId: string) {
         const period = await this.prisma.registrationPeriod.findUnique({
-            where:{
+            where: {
                 id: regId
             }
         })
-        if(!period)
-            throw new Error(`There is no registration period with ID ${regId}`)
+        if (!period)
+            throw new BadRequestException(`There is no registration period with ID ${regId}`)
         return period
+    }
+
+    async deleteRegistrationPeriod(/*authUser: JwtPayload,*/ regId: string) {
+        const period = await this.getRegistrationPeriod(/*authUser,*/ regId)
+        return this.prisma.registrationPeriod.delete({
+            where: {
+                id: regId
+            }
+        })
     }
 }
