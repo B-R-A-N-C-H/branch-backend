@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { Role } from "@prisma/client";
 import { JwtPayload } from "src/auth/dto/auth.dto";
 import { AuthenticatedUser } from "src/auth/guards/auth-user.decorator";
@@ -24,9 +24,15 @@ export class RegistrationController {
         return this.registrationService.createRegistrationPeriod(authUser, dto)
     }
 
-    //@Protected()
+    @Protected()
     @Get("/periods")
-    async getPeriod(/*@AuthenticatedUser() authUser: JwtPayload*/){
-        return this.registrationService.getAllRegistrationPeriods(/*authUser*/)
+    async getPeriods(@AuthenticatedUser() authUser: JwtPayload){
+        return this.registrationService.getAllRegistrationPeriods(authUser)
+    }
+
+    @Protected()
+    @Get("/periods/:id")
+    async getPeriodById(@AuthenticatedUser() authUser: JwtPayload, @Param("id") id: string){
+        return this.registrationService.getRegistrationPeriod(authUser, id)
     }
 }

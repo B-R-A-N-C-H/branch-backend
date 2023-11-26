@@ -10,7 +10,7 @@ export class RegistrationService {
     constructor(private prisma: PrismaService) { }
 
     async createRegistration(authUser: JwtPayload, dto: CreateRegistrationDto) {
-        //Implement Code
+        //Needs Fixing
         const currentDate = new Date()
         const regPeriod = await this.prisma.registrationPeriod.findFirst({
             where: {
@@ -30,6 +30,7 @@ export class RegistrationService {
     }
 
     async createRegistrationPeriod(authUser: JwtPayload, dto: CreateRegistrationPeriodDto) {
+        //Need to fix range detection
         try {
             const startDay = dto.starts
             startDay.setHours(0, 0, 0, 0)
@@ -64,11 +65,21 @@ export class RegistrationService {
         }
     }
 
-    async getAllRegistrationPeriods(/*authUser: JwtPayload*/) {
+    async getAllRegistrationPeriods(authUser: JwtPayload) {
         const periods = await this.prisma.registrationPeriod.findMany()
         if (!periods.length)
             throw new Error("There are no registration periods")
         return periods
     }
 
+    async getRegistrationPeriod(authUser: JwtPayload, regId: string) {
+        const period = await this.prisma.registrationPeriod.findUnique({
+            where:{
+                id: regId
+            }
+        })
+        if(!period)
+            throw new Error(`There is no registration period with ID ${regId}`)
+        return period
+    }
 }
