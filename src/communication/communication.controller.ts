@@ -2,7 +2,11 @@ import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/commo
 import {CommunicationService} from './communication.service';
 import { Role } from '@prisma/client';
 import Protected from '../auth/guards/protected.decorator';
-import { CreateEventDto, UpdateEventDto } from './dto/communication.dto';
+import { CreateEventDto,
+          UpdateEventDto,
+          CreateAnnouncementCommentDto,
+          CreateAnnouncementDto,
+          UpdateAnnouncementDto } from './dto/communication.dto';
 
 
 @Controller('communication')
@@ -49,7 +53,7 @@ export class CommunicationController {
 
   @Protected()
   @Post("announcements/:id/comments")
-  async createAnnouncementComment(@Param('id') id: string, @Body() dto: any) {
+  async createAnnouncementComment(@Param('id') id: string, @Body() dto: CreateAnnouncementCommentDto) {
     return this.communicationService.createAnnouncementComment(id, dto);
   }
 
@@ -61,13 +65,13 @@ export class CommunicationController {
 
   @Protected(Role.PRINCIPAL, Role.HEAD_TEACHER, Role.TEACHER, Role.ADMIN)
   @Patch("announcements/:id")
-  async updateAnnouncement(@Param('id') id: string, @Body() dto: any) {
+  async updateAnnouncement(@Param('id') id: string, @Body() dto: UpdateAnnouncementDto) {
     return this.communicationService.updateAnnouncement(id, dto);
   }
 
   @Protected(Role.PRINCIPAL, Role.HEAD_TEACHER, Role.TEACHER, Role.ADMIN)
   @Post("announcements")
-  async createAnnouncement(@Body() dto: any) {
+  async createAnnouncement(@Body() dto: CreateAnnouncementDto) {
     return this.communicationService.createAnnouncement(dto);
   }
 
