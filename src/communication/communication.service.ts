@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../utils/database/prisma.service';
-import { createEventDto, updateEventDto, createAnnouncementCommentDto } from './dto/communication.dto';
+import { CreateEventDto, UpdateEventDto, CreateAnnouncementCommentDto } from './dto/communication.dto';
 
 @Injectable()
 export class CommunicationService {
   constructor(private prisma: PrismaService) {}
 
-  async updateEvent(eventId: string, dto: updateEventDto)  {
+  async updateEvent(eventId: string, dto: UpdateEventDto)  {
     const event = await this.prisma.event.findUnique({
       where: {
         id: eventId,
@@ -25,7 +25,7 @@ export class CommunicationService {
     });
   }
 
-  async createEvent(dto: createEventDto) {
+  async createEvent(dto: CreateEventDto) {
     try {
       return await this.prisma.event.create({
         data: dto,
@@ -88,7 +88,7 @@ export class CommunicationService {
     });
   }
 
-  async createAnnouncementComment(id: string, dto: createAnnouncementCommentDto) {
+  async createAnnouncementComment(id: string, dto: CreateAnnouncementCommentDto) {
     try {
       return await this.prisma.announcementComment.create({
         data: {

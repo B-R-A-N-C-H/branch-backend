@@ -6,7 +6,7 @@ import {
    IsString,
 } from 'class-validator';
 
-export class updateEventDto{
+export class UpdateEventDto{
    @IsString() @IsNotEmpty()
    name: string;
 
@@ -19,7 +19,7 @@ export class updateEventDto{
    readonly ends?: Date;
 }
 
-export class createEventDto{
+export class CreateEventDto{
     @IsString() @IsNotEmpty()
     name: string;
 
@@ -30,7 +30,17 @@ export class createEventDto{
     ends: Date;
 }
 
-export class createAnnouncementCommentDto {
+export class CreateAnnouncementDto {
+  @IsString()
+  @IsNotEmpty()
+  content: string;
+
+  @IsString()
+  @IsNotEmpty()
+  announcerId: string;
+}
+
+export class CreateAnnouncementCommentDto {
   @IsString()
   @IsNotEmpty()
   content: string;
@@ -46,4 +56,14 @@ export class createAnnouncementCommentDto {
   @IsString()
   @IsOptional()
   parentCommentId?: string;
+}
+
+export class UpdateAnnouncementDto {
+  @IsString()
+  @IsNotEmpty()
+  content: string;
+
+  @IsString()
+  @IsNotEmpty()
+  announcerId: string;
 }

@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/commo
 import {CommunicationService} from './communication.service';
 import { Role } from '@prisma/client';
 import Protected from '../auth/guards/protected.decorator';
-import { createEventDto, updateEventDto } from './dto/communication.dto';
+import { CreateEventDto, UpdateEventDto } from './dto/communication.dto';
 
 
 @Controller('communication')
@@ -13,13 +13,13 @@ export class CommunicationController {
 
   @Protected(Role.PRINCIPAL, Role.HEAD_TEACHER, Role.ADMIN)
   @Patch("events/:id")
-  async updateEvent(@Param('id') id: string, @Body() dto: updateEventDto ) {
+  async updateEvent(@Param('id') id: string, @Body() dto: UpdateEventDto ) {
     return this.communicationService.updateEvent(id, dto)
   }
 
   @Protected(Role.PRINCIPAL, Role.HEAD_TEACHER, Role.ADMIN)
   @Post("events")
-  async createEvent(@Body() dto: createEventDto) {
+  async createEvent(@Body() dto: CreateEventDto) {
     return this.communicationService.createEvent(dto)
   }
 
