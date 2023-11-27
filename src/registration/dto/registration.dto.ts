@@ -1,5 +1,16 @@
 import { Type } from "class-transformer"
-import { IsBoolean, IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator"
+import {
+    IsBoolean,
+    IsDate,
+    IsEnum,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsPhoneNumber,
+    isPhoneNumber,
+    IsString,
+} from 'class-validator';
+
 
 enum GradeLevel{
     ONE = 1,
@@ -45,4 +56,14 @@ export class UpdateRegistrationDto {
 
 export class ApproveRegistrationDto {
     @IsBoolean() @IsNotEmpty() approved: boolean
+}
+
+export enum RegistrationPeriodStatus {
+    OPEN,
+    ALL,
+    CLOSED,
+}
+
+export class FetchRegistrationPeriodsQueryDto {
+    @IsOptional() @IsEnum(RegistrationPeriodStatus) status?: RegistrationPeriodStatus
 }
