@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Role } from '@prisma/client';
 import { JwtPayload } from 'src/auth/dto/auth.dto';
 import { AuthenticatedUser } from 'src/auth/guards/auth-user.decorator';
@@ -82,8 +83,11 @@ export class RegistrationController {
         return this.registrationService.updateRegistrationPeriod(/*authUser, */ id, dto);
     }
 
-    @Protected(Role.ADMIN, Role.PRINCIPAL)
+    //@Protected(Role.ADMIN, Role.PRINCIPAL)
     @Put("documents")
-    async uploadDocument(/*AuthenticatedUser() authUser: JwtPayload, */){}
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadDocument(@UploadedFile() file: Express.Multer.File){
+        return this.registrationService.uploadDocument(file)
+    }
     
 }

@@ -192,4 +192,13 @@ export class RegistrationService {
       }),
       );
   }
+
+  async uploadDocument(file: Express.Multer.File) {
+    /*const existingDoc = this.prisma.registrationDocument.findMany({
+      where:{
+
+      }
+    })*/
+    return "implement this"
+  }
 }
