@@ -1,9 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from "@nestjs/common";
 import { Role } from "@prisma/client";
 import { JwtPayload } from "src/auth/dto/auth.dto";
 import { AuthenticatedUser } from "src/auth/guards/auth-user.decorator";
 import Protected, { Roles } from "src/auth/guards/protected.decorator";
-import { CreateRegistrationDto, CreateRegistrationPeriodDto, UpdateRegistrationPeriodDto } from "./dto/registration.dto";
+import { ApproveRegistrationDto, CreateRegistrationDto, CreateRegistrationPeriodDto, UpdateRegistrationDto, UpdateRegistrationPeriodDto } from "./dto/registration.dto";
 import { RegistrationService } from "./registration.service";
 
 
@@ -18,10 +18,40 @@ export class RegistrationController {
         return this.registrationService.createRegistration(authUser, dto)
     }
 
-    @Protected(Role.ADMIN, Role.PRINCIPAL)
+    //@Protected(Role.ADMIN, Role.PRINCIPAL, Role.HEAD_TEACHER)
+    @Get("/entries")
+    async getRegistrationEntries(){
+        return this.registrationService.getAllRegistrationEntries()
+    }
+
+    //@Protected(Role.ADMIN, Role.PRINCIPAL, Role.HEAD_TEACHER)
+    @Get("/entries/:id")
+    async getRegistrationEntryById(@Param("id") id: string){
+        return this.registrationService.getRegistrationEntry(id)
+    }
+
+    //@Protected()
+    @Patch("/entries/:id")
+    async updateRegistrationEntryById(@Param("id") id: string, @Body() dto: UpdateRegistrationDto){
+        return this.registrationService.updateRegistrationEntry(id, dto)
+    }
+
+    @Protected()
+    @Delete("/entries/:id")
+    async deleteRegistrationEntryById(@AuthenticatedUser() authUser: JwtPayload, @Param("id") id: string){
+        return this.registrationService.deleteRegistrationEntry(authUser, id)
+    }
+
+    @Protected(Role.ADMIN, Role.PRINCIPAL, Role.TEACHER)
+    @Post("/entries/:id/review")
+    async approveRegistration(@Param("id") id: string, dto: ApproveRegistrationDto){
+        return this.registrationService.approveRegistrationEntry(id, dto)
+    }
+
+    //@Protected(Role.ADMIN, Role.PRINCIPAL)
     @Post("/periods")
-    async createPeriod(@AuthenticatedUser() authUser: JwtPayload, @Body() dto: CreateRegistrationPeriodDto) {
-        return this.registrationService.createRegistrationPeriod(authUser, dto)
+    async createPeriod(/*@AuthenticatedUser() authUser: JwtPayload,*/ @Body() dto: CreateRegistrationPeriodDto) {
+        return this.registrationService.createRegistrationPeriod(/*authUser,*/ dto)
     }
 
     //@Protected()
@@ -42,8 +72,14 @@ export class RegistrationController {
         return this.registrationService.deleteRegistrationPeriod(/*authUser, */ id)
     }
 
+    //@Protected(Role.ADMIN, Role.PRINCIPAL)
     @Patch("/periods/:id")
     async updatePeriodById(/*AuthenticatedUser() authUser: JwtPayload, */ @Param("id") id: string, @Body() dto: UpdateRegistrationPeriodDto) {
         return this.registrationService.updateRegistrationPeriod(/*authUser, */ id, dto)
     }
+
+    @Protected(Role.ADMIN, Role.PRINCIPAL)
+    @Put("documents")
+    async uploadDocument(/*AuthenticatedUser() authUser: JwtPayload, */){}
+    
 }

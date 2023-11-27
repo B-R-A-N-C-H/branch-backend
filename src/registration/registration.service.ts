@@ -1,9 +1,13 @@
-import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Injectable } from "@nestjs/common";
+import { Role } from "@prisma/client";
 import { JwtPayload } from "src/auth/dto/auth.dto";
+import { Roles } from "src/auth/guards/protected.decorator";
 import { PrismaService } from "src/utils/database/prisma.service";
 import {
+  ApproveRegistrationDto,
   CreateRegistrationDto,
   CreateRegistrationPeriodDto,
+  UpdateRegistrationDto,
   UpdateRegistrationPeriodDto
 } from "./dto/registration.dto";
 
@@ -15,7 +19,6 @@ export class RegistrationService {
   }
 
   async createRegistration(authUser: JwtPayload, dto: CreateRegistrationDto) {
-    //Needs Fixing
     const currentDate = new Date();
     const regPeriod = await this.prisma.registrationPeriod.findFirst({
       where: {
@@ -38,41 +41,72 @@ export class RegistrationService {
       }
     });
   }
+  
+  async getAllRegistrationEntries(){
+    const registrationEntries = await this.prisma.registrationEntry.findMany();
+    if (!registrationEntries.length)
+      throw new BadRequestException("There are no registration entries")
+    return registrationEntries
+  }
 
-  async createRegistrationPeriod(authUser: JwtPayload, dto: CreateRegistrationPeriodDto) {
-    //Need to fix range detection
-    try {
-      const startDay = dto.starts;
-      startDay.setHours(0, 0, 0, 0);
-      const endDay = dto.starts;
-      endDay.setHours(0, 0, 0, 0);
-      const existingPeriod = await this.prisma.registrationPeriod.findFirst({
-        where: {
-          OR: [
-            {
-              starts: {
-                gte: endDay,
-                lte: startDay
-              }
-            },
-            {
-              ends: {
-                gte: startDay,
-                lte: endDay
-              }
-            }
-          ]
-        }
-      });
-      if (existingPeriod)
-        throw new ConflictException("A registration period in that range already exists!");
+  async getRegistrationEntry(regEntryId: string){
+    const registrationEntry = await this.prisma.registrationEntry.findUnique({
+      where:{
+        id: regEntryId
+      }
+    })
+    if (!registrationEntry)
+      throw new BadRequestException(`There is no registration entry with ID ${regEntryId}`);
+    return registrationEntry
+  }
 
-      return this.prisma.registrationPeriod.create({
+  async updateRegistrationEntry(regEntryId: string, dto: UpdateRegistrationDto) {
+    return this.getRegistrationEntry(regEntryId).then((regEntry)=>{
+      return this.prisma.registrationEntry.update({
+        where:{
+          id: regEntry.id
+        },
         data: dto
-      });
-    } catch (error) {
-      throw new BadRequestException("Failed to create period. Details: ", error.message);
+      })
+    })
+}
+
+  async deleteRegistrationEntry(authUser: JwtPayload, regEntryId: string) {
+    if(authUser.sub.role === Role.ADMIN || authUser.sub.role === Role.PRINCIPAL){
+      const regEntry = await this.getRegistrationEntry(regEntryId)
+      return this.prisma.registrationEntry.delete({
+        where:{
+          id: regEntryId
+        }
+      })
     }
+    else if(authUser.sub.role === undefined){
+      const regEntry = await this.getRegistrationEntry(regEntryId)
+      return this.prisma.registrationEntry.delete({
+        where:{
+          id: regEntryId,
+          memberId: authUser.sub.id
+        }
+      })
+    }
+    throw new ForbiddenException("You can't delete this entry")
+  }
+
+  async approveRegistrationEntry(regEntryId: string, dto: ApproveRegistrationDto){
+    //Need to fix
+    console.log(dto, regEntryId)
+    return this.prisma.registrationEntry.update({
+      where:{
+        id: regEntryId
+      },
+      data: dto
+    })
+  }
+
+  async createRegistrationPeriod(/*authUser: JwtPayload,*/ dto: CreateRegistrationPeriodDto) {
+    return this.prisma.registrationPeriod.create({
+      data: dto
+    });
   }
 
   async getAllRegistrationPeriods(authUser: JwtPayload) {
