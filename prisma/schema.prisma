@@ -79,7 +79,7 @@ model RegistrationEntry {
 
 model RegistrationDocument {
   id   String @id @default(cuid())
-  name String
+  name String @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
