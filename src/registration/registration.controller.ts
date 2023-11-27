@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestj
 import { Role } from '@prisma/client';
 import { JwtPayload } from 'src/auth/dto/auth.dto';
 import { AuthenticatedUser } from 'src/auth/guards/auth-user.decorator';
-import Protected, { Roles } from 'src/auth/guards/protected.decorator';
+import Protected from 'src/auth/guards/protected.decorator';
 import {
     CreateRegistrationDto,
     CreateRegistrationPeriodDto, FetchRegistrationPeriodsQueryDto,
