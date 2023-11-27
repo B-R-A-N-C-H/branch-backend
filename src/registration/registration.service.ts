@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
 import { JwtPayload } from "src/auth/dto/auth.dto";
 import { PrismaService } from "src/utils/database/prisma.service";
-import { CreateRegistrationDto, CreateRegistrationPeriodDto } from "./dto/registration.dto";
+import { CreateRegistrationDto, CreateRegistrationPeriodDto, UpdateRegistrationPeriodDto } from "./dto/registration.dto";
 
 
 @Injectable()
@@ -89,6 +89,17 @@ export class RegistrationService {
             where: {
                 id: regId
             }
+        })
+    }
+
+    async updateRegistrationPeriod(/*authUser: JwtPayload, */regId: string, dto: UpdateRegistrationPeriodDto){
+        return this.getRegistrationPeriod(regId).then(async (period)=>{
+            return await this.prisma.registrationPeriod.update({
+                where:{
+                    id: regId
+                },
+                data: dto
+            });
         })
     }
 }

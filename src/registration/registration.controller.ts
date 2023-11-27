@@ -1,9 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
 import { Role } from "@prisma/client";
 import { JwtPayload } from "src/auth/dto/auth.dto";
 import { AuthenticatedUser } from "src/auth/guards/auth-user.decorator";
 import Protected, { Roles } from "src/auth/guards/protected.decorator";
-import { CreateRegistrationDto, CreateRegistrationPeriodDto } from "./dto/registration.dto";
+import { CreateRegistrationDto, CreateRegistrationPeriodDto, UpdateRegistrationPeriodDto } from "./dto/registration.dto";
 import { RegistrationService } from "./registration.service";
 
 
@@ -40,5 +40,10 @@ export class RegistrationController {
     @Delete("/periods/:id")
     async deletePeriodById(/*@AuthenticatedUser() authUser: JwtPayload, */ @Param("id") id: string) {
         return this.registrationService.deleteRegistrationPeriod(/*authUser, */ id)
+    }
+
+    @Patch("/periods/:id")
+    async updatePeriodById(/*AuthenticatedUser() authUser: JwtPayload, */ @Param("id") id: string, @Body() dto: UpdateRegistrationPeriodDto) {
+        return this.registrationService.updateRegistrationPeriod(/*authUser, */ id, dto)
     }
 }
