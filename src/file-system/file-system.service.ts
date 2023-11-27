@@ -20,4 +20,11 @@ export class FileSystemService {
         fs.unlinkSync(path);
     }
 
+    fetchFile(path: string, fileName: string) {
+        const fullPath = `${path}/${fileName}`
+        if (!this.fileExists(fullPath))
+            throw new Error(`There is no file at ${fullPath}`);
+        return new File([new Blob([fs.readFileSync(fullPath)])], fileName);
+    }
+
 }
