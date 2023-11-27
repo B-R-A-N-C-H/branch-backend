@@ -32,7 +32,7 @@ export class RegistrationService {
     return this.prisma.registrationEntry.create({
       data: {
         ...dto,
-        secondaryEmergencyConctactNumber: dto.secondaryEmergencyConctactNumber ?? null,
+        secondaryEmergencyContactNumber: dto.secondaryEmergencyContactNumber ?? null,
         memberId: authUser.sub.id,
         registrationPeriodId: regPeriod.id
       }

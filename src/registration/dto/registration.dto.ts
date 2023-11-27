@@ -13,7 +13,7 @@ export class CreateRegistrationDto {
     @IsString() city: string
     @IsString() parish: string
     @IsString() @IsPhoneNumber("JM") emergencyContactNumber: string
-    @IsString() @IsPhoneNumber("JM") secondaryEmergencyConctactNumber?: string
+    @IsString() @IsPhoneNumber("JM") secondaryEmergencyContactNumber?: string
 }
 
 export class CreateRegistrationPeriodDto {

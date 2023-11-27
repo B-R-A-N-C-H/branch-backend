@@ -67,8 +67,8 @@ model RegistrationEntry {
   city       String
   parish     String
 
-  emergencyContactNumber           String
-  secondaryEmergencyConctactNumber String
+  emergencyContactNumber          String
+  secondaryEmergencyContactNumber String
 
   for                  RegistrationPeriod @relation(fields: [registrationPeriodId], references: [id], onDelete: Cascade)
   registrationPeriodId String
