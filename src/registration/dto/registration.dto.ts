@@ -1,5 +1,6 @@
 import { Type } from "class-transformer"
 import {
+    Allow,
     IsBoolean,
     IsDate,
     IsEnum,
@@ -55,7 +56,7 @@ export class UpdateRegistrationDto {
 }
 
 export class ApproveRegistrationDto {
-    @IsBoolean() @IsNotEmpty() approved: boolean
+    @IsBoolean() @IsNotEmpty() @Allow() approved: boolean
 }
 
 export enum RegistrationPeriodStatus {

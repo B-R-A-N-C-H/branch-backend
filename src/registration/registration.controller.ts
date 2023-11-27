@@ -48,7 +48,7 @@ export class RegistrationController {
 
     @Protected(Role.ADMIN, Role.PRINCIPAL, Role.TEACHER)
     @Post("/entries/:id/review")
-    async approveRegistration(@Param("id") id: string, dto: ApproveRegistrationDto){
+    async approveRegistration(@Param("id") id: string, @Body() dto: ApproveRegistrationDto){
         return this.registrationService.approveRegistrationEntry(id, dto)
     }
 

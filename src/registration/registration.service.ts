@@ -92,10 +92,8 @@ export class RegistrationService {
       })
     })
   }
-  
+
   async approveRegistrationEntry(regEntryId: string, dto: ApproveRegistrationDto){
-    //Need to fix
-    console.log(dto, regEntryId)
     return this.prisma.registrationEntry.update({
       where:{
         id: regEntryId
