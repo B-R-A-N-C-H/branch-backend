@@ -96,8 +96,6 @@ export class RegistrationService {
                 },
             } : undefined),
         });
-        if (!periods.length)
-            throw new BadRequestException('There are no registration periods');
         return periods;
     }
 
