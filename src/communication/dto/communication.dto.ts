@@ -72,6 +72,6 @@ export class UpdateAnnouncementDto {
     content?: string;
 
     @IsEnum(AnnouncementLevel)
-    @IsOptional
+    @IsOptional()
     level?: AnnouncementLevel;
 }
