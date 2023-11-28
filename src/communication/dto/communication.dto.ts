@@ -1,9 +1,10 @@
 import {
-    IsDateString,
+    IsDateString, IsEnum,
     IsNotEmpty,
     IsOptional,
     IsString,
 } from 'class-validator';
+import { AnnouncementLevel } from '@prisma/client';
 
 export class UpdateEventDto {
     @IsString() @IsNotEmpty()
@@ -41,6 +42,10 @@ export class CreateAnnouncementDto {
     @IsString()
     @IsNotEmpty()
     announcerId: string;
+
+    @IsEnum(AnnouncementLevel)
+    @IsOptional
+    level?: AnnouncementLevel;
 }
 
 export class CreateAnnouncementCommentDto {
@@ -65,4 +70,8 @@ export class UpdateAnnouncementDto {
     @IsString()
     @IsOptional()
     content?: string;
+
+    @IsEnum(AnnouncementLevel)
+    @IsOptional
+    level?: AnnouncementLevel;
 }
