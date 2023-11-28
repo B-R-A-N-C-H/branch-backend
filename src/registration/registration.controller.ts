@@ -56,8 +56,8 @@ export class RegistrationController {
     
     @Protected(Role.ADMIN, Role.PRINCIPAL)
     @Post('/periods')
-    async createPeriod(@AuthenticatedUser() authUser: JwtPayload, @Body() dto: CreateRegistrationPeriodDto) {
-        return this.registrationService.createRegistrationPeriod(authUser, dto);
+    async createPeriod(@Body() dto: CreateRegistrationPeriodDto) {
+        return this.registrationService.createRegistrationPeriod(dto);
     }
 
     @Protected()

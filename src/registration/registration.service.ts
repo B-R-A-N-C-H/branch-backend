@@ -45,23 +45,20 @@ export class RegistrationService {
     }
 
     async deleteRegistrationEntry(authUser: JwtPayload, regEntryId: string) {
-        if (authUser.sub.role === Role.ADMIN || authUser.sub.role === Role.PRINCIPAL) {
-            const regEntry = await this.getRegistrationEntry(regEntryId);
-            return this.prisma.registrationEntry.delete({
-                where: {
-                    id: regEntryId,
-                },
-            });
-        } else if (authUser.sub.role === undefined) {
-            const regEntry = await this.getRegistrationEntry(regEntryId);
-            return this.prisma.registrationEntry.delete({
-                where: {
-                    id: regEntryId,
-                    memberId: authUser.sub.id,
-                },
-            });
-        }
-        throw new ForbiddenException('You can\'t delete this entry');
+        const entry = await this.getRegistrationEntry(regEntryId);
+
+        if (entry.memberId !== authUser.sub.id
+            && authUser.sub.role !== Role.ADMIN
+            && authUser.sub.role !== Role.PRINCIPAL
+        )
+            throw new ForbiddenException('You can\'t delete this entry');
+
+        return this.prisma.registrationEntry.delete({
+            where: {
+                id: regEntryId,
+                memberId: authUser.sub.id,
+            },
+        });
     }
 
     async getRegistrationEntry(regEntryId: string) {
@@ -99,7 +96,7 @@ export class RegistrationService {
         });
     }
 
-    async createRegistrationPeriod(authUser: JwtPayload, dto: CreateRegistrationPeriodDto) {
+    async createRegistrationPeriod(dto: CreateRegistrationPeriodDto) {
         const startDay = dto.starts;
         startDay.setHours(0, 0, 0, 0);
         const endDay = dto.starts;
@@ -125,7 +122,6 @@ export class RegistrationService {
         if (existingPeriod)
             throw new ConflictException('A registration period in that range already exists!');
 
-        //Need to fix range detection
         try {
             return this.prisma.registrationPeriod.create({
                 data: dto,
@@ -137,8 +133,7 @@ export class RegistrationService {
 
     async getAllRegistrationPeriods(status: RegistrationPeriodStatus = RegistrationPeriodStatus.ALL) {
         const today = new Date();
-
-        const periods = await this.prisma.registrationPeriod.findMany({
+        return this.prisma.registrationPeriod.findMany({
             where: status === RegistrationPeriodStatus.OPEN ? {
                 starts: {
                     gte: today,
@@ -155,7 +150,6 @@ export class RegistrationService {
                 },
             } : undefined),
         });
-        return periods;
     }
 
     async getRegistrationPeriod(regId: string) {
@@ -212,18 +206,18 @@ export class RegistrationService {
 
     async getDocument(fileId: string) {
         const filePrefix = process.env.FILE_PREFIX;
-        const regDocument = await this.getDocumentQuery(fileId)
+        const regDocument = await this.getDocumentQuery(fileId);
         if (!regDocument)
             throw new BadRequestException(`There is no registration period with ID ${fileId}`);
         return this.fileSystem.fetchFile(filePrefix, regDocument.name);
     }
 
     async getDocumentQuery(fileId: string) {
-      return this.prisma.registrationDocument.findUnique({
-        where: {
-            id: fileId,
-        },
-    });
+        return this.prisma.registrationDocument.findUnique({
+            where: {
+                id: fileId,
+            },
+        });
     }
 
     async getAllDocuments() {
@@ -231,12 +225,12 @@ export class RegistrationService {
     }
 
     async deleteDocument(fileId: string) {
-      const filePrefix = process.env.FILE_PREFIX
-      const regDocument = await this.getDocumentQuery(fileId)
-      if (!regDocument)
+        const filePrefix = process.env.FILE_PREFIX;
+        const regDocument = await this.getDocumentQuery(fileId);
+        if (!regDocument)
             throw new BadRequestException(`There is no registration period with ID ${fileId}`);
-      this.fileSystem.deleteFile(`${filePrefix}/${regDocument.name}`)
-      return this.prisma.registrationDocument.delete({
+        this.fileSystem.deleteFile(`${filePrefix}/${regDocument.name}`);
+        return this.prisma.registrationDocument.delete({
             where: {
                 id: fileId,
             },
