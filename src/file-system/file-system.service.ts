@@ -23,7 +23,6 @@ export class FileSystemService {
 
     fetchFile(path: string, fileName: string) {
         const fullPath = `${path}/${fileName}`;
-        console.log(fullPath);
         if (!this.fileExists(fullPath))
             throw new Error(`There is no file at ${fullPath}`);
         const file = createReadStream(fullPath);
