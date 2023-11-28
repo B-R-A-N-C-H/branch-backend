@@ -76,10 +76,7 @@ export class RegistrationService {
     }
 
     async getAllRegistrationEntries() {
-        const registrationEntries = await this.prisma.registrationEntry.findMany();
-        if (!registrationEntries.length)
-            throw new BadRequestException('There are no registration entries');
-        return registrationEntries;
+        return this.prisma.registrationEntry.findMany();
     }
 
     async updateRegistrationEntry(regEntryId: string, dto: UpdateRegistrationDto) {
