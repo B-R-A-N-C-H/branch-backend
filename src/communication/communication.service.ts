@@ -1,6 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../utils/database/prisma.service';
-import { CreateEventDto, UpdateEventDto, CreateAnnouncementCommentDto } from './dto/communication.dto';
+import {
+  CreateEventDto,
+  UpdateEventDto,
+  CreateAnnouncementCommentDto,
+  CreateAnnouncementDto,
+} from './dto/communication.dto';
 
 @Injectable()
 export class CommunicationService {
@@ -145,7 +150,7 @@ export class CommunicationService {
     });
   }
 
-  async createAnnouncement(dto: any) {
+  async createAnnouncement(dto: CreateAnnouncementDto) {
     try {
       return await this.prisma.announcement.create({
         data: dto,
