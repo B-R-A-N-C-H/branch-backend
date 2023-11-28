@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Patch,
+    Post,
+    Put,
+    Query,
+    UploadedFile,
+    UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Role } from '@prisma/client';
 import { JwtPayload } from 'src/auth/dto/auth.dto';
@@ -7,7 +19,7 @@ import Protected from 'src/auth/guards/protected.decorator';
 import {
     CreateRegistrationDto,
     CreateRegistrationPeriodDto, FetchRegistrationPeriodsQueryDto,
-    UpdateRegistrationPeriodDto, ApproveRegistrationDto, UpdateRegistrationDto 
+    UpdateRegistrationPeriodDto, ApproveRegistrationDto, UpdateRegistrationDto,
 } from './dto/registration.dto';
 import { RegistrationService } from './registration.service';
 
@@ -24,36 +36,36 @@ export class RegistrationController {
     }
 
     @Protected()
-    @Get("/entries")
-    async getRegistrationEntries(@AuthenticatedUser() authUser: JwtPayload){
-        return this.registrationService.getAllRegistrationEntries(authUser)
+    @Get('/entries')
+    async getRegistrationEntries(@AuthenticatedUser() authUser: JwtPayload) {
+        return this.registrationService.getAllRegistrationEntries(authUser);
     }
 
     @Protected(Role.ADMIN, Role.PRINCIPAL, Role.HEAD_TEACHER)
-    @Get("/entries/:id")
-    async getRegistrationEntryById(@Param("id") id: string){
-        return this.registrationService.getRegistrationEntry(id)
+    @Get('/entries/:id')
+    async getRegistrationEntryById(@Param('id') id: string) {
+        return this.registrationService.getRegistrationEntry(id);
     }
 
     @Protected()
-    @Patch("/entries/:id")
-    async updateRegistrationEntryById(@Param("id") id: string, @Body() dto: UpdateRegistrationDto){
-        return this.registrationService.updateRegistrationEntry(id, dto)
+    @Patch('/entries/:id')
+    async updateRegistrationEntryById(@Param('id') id: string, @Body() dto: UpdateRegistrationDto) {
+        return this.registrationService.updateRegistrationEntry(id, dto);
     }
 
     @Protected()
-    @Delete("/entries/:id")
-    async deleteRegistrationEntryById(@AuthenticatedUser() authUser: JwtPayload, @Param("id") id: string){
-        return this.registrationService.deleteRegistrationEntry(authUser, id)
+    @Delete('/entries/:id')
+    async deleteRegistrationEntryById(@AuthenticatedUser() authUser: JwtPayload, @Param('id') id: string) {
+        return this.registrationService.deleteRegistrationEntry(authUser, id);
     }
 
     @Protected(Role.ADMIN, Role.PRINCIPAL, Role.TEACHER)
-    @Post("/entries/:id/review")
-    async approveRegistration(@Param("id") id: string, @Body() dto: ApproveRegistrationDto){
-        return this.registrationService.approveRegistrationEntry(id, dto)
+    @Post('/entries/:id/review')
+    async approveRegistration(@Param('id') id: string, @Body() dto: ApproveRegistrationDto) {
+        return this.registrationService.approveRegistrationEntry(id, dto);
     }
 
-    
+
     @Protected(Role.ADMIN, Role.PRINCIPAL)
     @Post('/periods')
     async createPeriod(@Body() dto: CreateRegistrationPeriodDto) {
@@ -74,38 +86,38 @@ export class RegistrationController {
 
     @Protected(Role.ADMIN, Role.PRINCIPAL)
     @Delete('/periods/:id')
-    async deletePeriodById(@AuthenticatedUser() authUser: JwtPayload, @Param('id') id: string) {
-        return this.registrationService.deleteRegistrationPeriod(/*authUser, */ id);
+    async deletePeriodById(@Param('id') id: string) {
+        return this.registrationService.deleteRegistrationPeriod(id);
     }
 
     @Protected(Role.ADMIN, Role.PRINCIPAL)
     @Patch('/periods/:id')
-    async updatePeriodById(@AuthenticatedUser() authUser: JwtPayload, @Param('id') id: string, @Body() dto: UpdateRegistrationPeriodDto) {
-        return this.registrationService.updateRegistrationPeriod(/*authUser, */ id, dto);
+    async updatePeriodById(@Param('id') id: string, @Body() dto: UpdateRegistrationPeriodDto) {
+        return this.registrationService.updateRegistrationPeriod(id, dto);
     }
 
     @Protected(Role.ADMIN, Role.PRINCIPAL)
-    @Put("/documents")
+    @Put('/documents')
     @UseInterceptors(FileInterceptor('file'))
-    async uploadDocument(@UploadedFile() file: Express.Multer.File){
-        return this.registrationService.uploadDocument(file)
+    async uploadDocument(@UploadedFile() file: Express.Multer.File) {
+        return this.registrationService.uploadDocument(file);
     }
 
     @Protected()
-    @Get("/documents/:id")
-    async getDocument(@Param('id') id: string){
-        return this.registrationService.getDocument(id)
+    @Get('/documents/:id')
+    async getDocument(@Param('id') id: string) {
+        return this.registrationService.getDocument(id);
     }
-    
+
     @Protected()
-    @Get("/documents")
-    async getDocuments(){
-        return this.registrationService.getAllDocuments()
+    @Get('/documents')
+    async getDocuments() {
+        return this.registrationService.getAllDocuments();
     }
 
     @Protected(Role.ADMIN, Role.PRINCIPAL)
-    @Delete("/documents/:id")
-    async deleteDocument(@Param("id") id: string){
-        return this.registrationService.deleteDocument(id)
+    @Delete('/documents/:id')
+    async deleteDocument(@Param('id') id: string) {
+        return this.registrationService.deleteDocument(id);
     }
 }
