@@ -174,7 +174,50 @@ export class CommunicationService {
     return announcement;
   }
 
-  async getAllAnnouncements() {
-    return this.prisma.announcement.findMany();
+  async getAllAnnouncements(memberId: string) {
+    const member = await this.prisma.member.findUnique({
+      where: { id: memberId },
+      include: { children: true }
+    });
+
+    if (!member) {
+      throw new NotFoundException('Member not found');
+    }
+
+    let whereQuery = {};
+
+    // Apply filtering only for regular users (non-admins)
+    if (member.role === null) {
+      const childGradeLevels = member.children.map(child => parseInt(child.gradeLevel));
+
+      if (childGradeLevels.length === 0) {
+        // Users with no registered students see only global announcements
+        whereQuery = { level: 'GLOBAL' };
+      } else {
+        const childAnnouncementLevel = [...new Set(
+          childGradeLevels
+            .filter(level => [1, 2, 3].includes(level))
+            .map(level => {
+              switch (level) {
+                case 1: return 'ONE';
+                case 2: return 'TWO';
+                case 3: return 'THREE';
+                default: return 'GLOBAL';
+              }
+            })
+        )];
+
+        whereQuery = {
+          level: {
+            in: childAnnouncementLevel
+          }
+        };
+      }
+    }
+
+    return this.prisma.announcement.findMany({
+      where: whereQuery
+    });
   }
+
 }
