@@ -15,7 +15,7 @@ import { FileSystemService } from './file-system/file-system.service';
   }),
     MemberModule,
     AuthModule,
-    CommunicationModule
+    CommunicationModule,
     RegistrationModule,
   ],
   providers: [PrismaService, FileSystemService]
