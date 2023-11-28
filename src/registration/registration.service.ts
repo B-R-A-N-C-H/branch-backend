@@ -1,15 +1,14 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { JwtPayload } from 'src/auth/dto/auth.dto';
-import { Roles } from 'src/auth/guards/protected.decorator';
 import { FileSystemService } from 'src/file-system/file-system.service';
 import { PrismaService } from 'src/utils/database/prisma.service';
 import {
     ApproveRegistrationDto,
     CreateRegistrationDto,
     CreateRegistrationPeriodDto,
-    UpdateRegistrationDto,
     RegistrationPeriodStatus,
+    UpdateRegistrationDto,
     UpdateRegistrationPeriodDto,
 } from './dto/registration.dto';
 
@@ -231,10 +230,7 @@ export class RegistrationService {
     }
 
     async getAllDocuments() {
-      const regDocuments = await this.prisma.registrationDocument.findMany()
-      if (!regDocuments.length)
-        throw new BadRequestException("There are no Registration Documents");
-      return regDocuments
+        return this.prisma.registrationDocument.findMany();
     }
 
     async deleteDocument(fileId: string) {
