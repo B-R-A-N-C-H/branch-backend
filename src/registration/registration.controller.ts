@@ -23,10 +23,10 @@ export class RegistrationController {
         return this.registrationService.createRegistration(authUser, dto);
     }
 
-    @Protected(Role.ADMIN, Role.PRINCIPAL, Role.HEAD_TEACHER)
+    @Protected()
     @Get("/entries")
-    async getRegistrationEntries(){
-        return this.registrationService.getAllRegistrationEntries()
+    async getRegistrationEntries(@AuthenticatedUser() authUser: JwtPayload){
+        return this.registrationService.getAllRegistrationEntries(authUser)
     }
 
     @Protected(Role.ADMIN, Role.PRINCIPAL, Role.HEAD_TEACHER)

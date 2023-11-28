@@ -72,8 +72,12 @@ export class RegistrationService {
         return registrationEntry;
     }
 
-    async getAllRegistrationEntries() {
-        return this.prisma.registrationEntry.findMany();
+    async getAllRegistrationEntries(user: JwtPayload) {
+        return this.prisma.registrationEntry.findMany({
+            where: !([Role.ADMIN, Role.PRINCIPAL, Role.HEAD_TEACHER] as Role[]).includes(user.sub.role) ? {
+                memberId: user.sub.id,
+            } : undefined,
+        });
     }
 
     async updateRegistrationEntry(regEntryId: string, dto: UpdateRegistrationDto) {
