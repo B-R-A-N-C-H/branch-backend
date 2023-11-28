@@ -26,7 +26,7 @@ export class StudentManagementService {
       return student;
     }
     else {
-      throw new NotFoundException("Student not found!");
+       throw new NotFoundException("Student not found!");
     }
   }
 
@@ -55,21 +55,21 @@ export class StudentManagementService {
 
   async UpdateStudent(studentId: string, dataTransObj: UpdateStudentDto) {
     const student = await this.Prisma.student.findUnique({
-      where: {
-        id: studentId
+        where: {
+          id: studentId
+        }
+      });
+
+      if (!studentId) {
+        throw new NotFoundException('student not found');
       }
-    });
-
-    if (!studentId) {
-      throw new NotFoundException('student not found');
-    }
 
 
-    return this.Prisma.student.update({
-      where: {
-        id: studentId
-      },
-      data: dataTransObj
+      return this.Prisma.student.update({
+        where: {
+          id: studentId
+        },
+        data: dataTransObj
     })
   }
 
