@@ -189,7 +189,11 @@ export class CommunicationService {
             },
             include: {
                 announcer: true,
-                comments: true,
+                comments: {
+                    include: {
+                        commenter: true,
+                    },
+                },
             },
         });
 
