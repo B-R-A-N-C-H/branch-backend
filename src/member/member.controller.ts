@@ -12,6 +12,12 @@ export class MemberController {
   constructor(private memberService: MemberService) {
   }
 
+  @Protected(Role.ADMIN, Role.PRINCIPAL)
+  @Get()
+  async getAllMembers() {
+    return this.memberService.findAll();
+  }
+
   @Protected()
   @Get("@me")
   async getSelf(@AuthenticatedUser() authenticatedUser: JwtPayload) {

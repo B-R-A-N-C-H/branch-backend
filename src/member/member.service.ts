@@ -40,6 +40,10 @@ export class MemberService {
     return result;
   }
 
+  async findAll() {
+    return this.prisma.member.findMany();
+  }
+
   async findByEmail(dto: FindMemberByEmailDto, options?: {
     excludePassword?: boolean,
   }): Promise<Omit<Member, "password"> & { password?: string }> {
