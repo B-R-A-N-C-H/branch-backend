@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req } from '@nestjs/common';
 import {CommunicationService} from './communication.service';
 import { Role } from '@prisma/client';
 import Protected from '../auth/guards/protected.decorator';
@@ -7,6 +7,8 @@ import { CreateEventDto,
           CreateAnnouncementCommentDto,
           CreateAnnouncementDto,
           UpdateAnnouncementDto } from './dto/communication.dto';
+import { AuthenticatedUser } from '../auth/guards/auth-user.decorator';
+import { JwtPayload } from '../auth/dto/auth.dto';
 
 
 @Controller('communication')
@@ -83,7 +85,11 @@ export class CommunicationController {
 
   @Protected()
   @Get("announcements")
-  async getAllAnnouncements() {
-    return this.communicationService.getAllAnnouncements();
+  async getAllAnnouncements(@AuthenticatedUser() authenticatedUser: JwtPayload) {
+    // Extract the memberId from the authenticated user's payload
+    const memberId = authenticatedUser.sub.id;
+    // Call the service method with the memberId
+    return this.communicationService.getAllAnnouncements(memberId);
   }
+
 }
