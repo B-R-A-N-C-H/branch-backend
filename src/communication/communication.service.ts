@@ -13,7 +13,7 @@ import {
     CreateAnnouncementDto, UpdateAnnouncementDto,
 } from './dto/communication.dto';
 import { JwtPayload } from '../auth/dto/auth.dto';
-import { Member, Role, Student } from '@prisma/client';
+import { AnnouncementLevel, Member, Role, Student } from '@prisma/client';
 import { MemberService } from '../member/member.service';
 
 @Injectable()
@@ -109,7 +109,7 @@ export class CommunicationService {
             where: {
                 id: announcementId,
                 level: user.sub.role === null ? {
-                    in: memberAnnouncementLevels,
+                    in: memberAnnouncementLevels as AnnouncementLevel[],
                 } : undefined,
             },
         });
@@ -267,11 +267,9 @@ export class CommunicationService {
                             return 'TWO';
                         case 3:
                             return 'THREE';
-                        default:
-                            return 'GLOBAL';
                     }
                 }),
-        )];
+        ), 'GLOBAL'];
     }
 
 }
