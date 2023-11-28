@@ -4,6 +4,7 @@ import { MemberModule } from "./member/member.module";
 import { AuthModule } from "./auth/auth.module";
 import configuration from "./utils/config/configuration";
 import { PrismaService } from "./utils/database/prisma.service";
+import { RegistrationModule } from './registration/registration.module';
 import { FileSystemService } from './file-system/file-system.service';
 
 @Module({
@@ -12,7 +13,8 @@ import { FileSystemService } from './file-system/file-system.service';
     isGlobal: true
   }),
     MemberModule,
-    AuthModule
+    AuthModule,
+    RegistrationModule,
   ],
   providers: [PrismaService, FileSystemService]
 })
