@@ -44,7 +44,7 @@ export class CreateAnnouncementDto {
     announcerId: string;
 
     @IsEnum(AnnouncementLevel)
-    @IsOptional
+    @IsOptional()
     level?: AnnouncementLevel;
 }
 

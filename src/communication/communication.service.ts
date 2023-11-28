@@ -187,6 +187,10 @@ export class CommunicationService {
                 id: announcementId,
                 ...await this.getAnnouncementFilter(user),
             },
+            include: {
+                announcer: true,
+                comments: true,
+            },
         });
 
         if (!announcement)
@@ -197,6 +201,9 @@ export class CommunicationService {
     async getAllAnnouncements(user: JwtPayload) {
         return this.prisma.announcement.findMany({
             where: await this.getAnnouncementFilter(user),
+            include: {
+                announcer: true,
+            },
         });
     }
 
