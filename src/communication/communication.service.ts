@@ -100,8 +100,7 @@ export class CommunicationService {
           content: dto.content,
           announcementId: dto.announcementId,
           commenterId: dto.commenterId,
-          //include the parentCommentId if it exists in the DTO
-          ...(dto.parentCommentId && { parentCommentId: dto.parentCommentId }),
+          parentCommentId: dto.parentCommentId ?? null,
         }
       });
     } catch (error) {
