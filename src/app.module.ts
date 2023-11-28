@@ -5,6 +5,7 @@ import {CommunicationModule} from './communication/communication.module';
 import { AuthModule } from "./auth/auth.module";
 import configuration from "./utils/config/configuration";
 import { PrismaService } from "./utils/database/prisma.service";
+import { RegistrationModule } from './registration/registration.module';
 import { FileSystemService } from './file-system/file-system.service';
 
 @Module({
@@ -15,6 +16,7 @@ import { FileSystemService } from './file-system/file-system.service';
     MemberModule,
     AuthModule,
     CommunicationModule
+    RegistrationModule,
   ],
   providers: [PrismaService, FileSystemService]
 })
