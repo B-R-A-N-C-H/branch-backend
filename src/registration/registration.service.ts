@@ -230,6 +230,13 @@ export class RegistrationService {
     });
     }
 
+    async getAllDocuments() {
+      const regDocuments = await this.prisma.registrationDocument.findMany()
+      if (!regDocuments.length)
+        throw new BadRequestException("There are no Registration Documents");
+      return regDocuments
+    }
+
     async deleteDocument(fileId: string) {
       const filePrefix = process.env.FILE_PREFIX
       const regDocument = await this.getDocumentQuery(fileId)

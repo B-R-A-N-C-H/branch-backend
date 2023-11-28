@@ -23,19 +23,19 @@ export class RegistrationController {
         return this.registrationService.createRegistration(authUser, dto);
     }
 
-    //@Protected(Role.ADMIN, Role.PRINCIPAL, Role.HEAD_TEACHER)
+    @Protected(Role.ADMIN, Role.PRINCIPAL, Role.HEAD_TEACHER)
     @Get("/entries")
     async getRegistrationEntries(){
         return this.registrationService.getAllRegistrationEntries()
     }
 
-    //@Protected(Role.ADMIN, Role.PRINCIPAL, Role.HEAD_TEACHER)
+    @Protected(Role.ADMIN, Role.PRINCIPAL, Role.HEAD_TEACHER)
     @Get("/entries/:id")
     async getRegistrationEntryById(@Param("id") id: string){
         return this.registrationService.getRegistrationEntry(id)
     }
 
-    //@Protected()
+    @Protected()
     @Patch("/entries/:id")
     async updateRegistrationEntryById(@Param("id") id: string, @Body() dto: UpdateRegistrationDto){
         return this.registrationService.updateRegistrationEntry(id, dto)
@@ -68,8 +68,8 @@ export class RegistrationController {
 
     @Protected()
     @Get('/periods/:id')
-    async getPeriodById(@AuthenticatedUser() authUser: JwtPayload, @Param('id') id: string) {
-        return this.registrationService.getRegistrationPeriod(/*authUser,*/ id);
+    async getPeriodById(@Param('id') id: string) {
+        return this.registrationService.getRegistrationPeriod(id);
     }
 
     @Protected(Role.ADMIN, Role.PRINCIPAL)
@@ -78,24 +78,32 @@ export class RegistrationController {
         return this.registrationService.deleteRegistrationPeriod(/*authUser, */ id);
     }
 
+    @Protected(Role.ADMIN, Role.PRINCIPAL)
     @Patch('/periods/:id')
     async updatePeriodById(@AuthenticatedUser() authUser: JwtPayload, @Param('id') id: string, @Body() dto: UpdateRegistrationPeriodDto) {
         return this.registrationService.updateRegistrationPeriod(/*authUser, */ id, dto);
     }
 
-    //@Protected(Role.ADMIN, Role.PRINCIPAL)
+    @Protected(Role.ADMIN, Role.PRINCIPAL)
     @Put("/documents")
     @UseInterceptors(FileInterceptor('file'))
     async uploadDocument(@UploadedFile() file: Express.Multer.File){
         return this.registrationService.uploadDocument(file)
     }
 
-    //@Protected()
+    @Protected()
     @Get("/documents/:id")
     async getDocument(@Param('id') id: string){
         return this.registrationService.getDocument(id)
     }
     
+    @Protected()
+    @Get("/documents")
+    async getDocuments(){
+        return this.registrationService.getAllDocuments()
+    }
+
+    @Protected(Role.ADMIN, Role.PRINCIPAL)
     @Delete("/documents/:id")
     async deleteDocument(@Param("id") id: string){
         return this.registrationService.deleteDocument(id)
