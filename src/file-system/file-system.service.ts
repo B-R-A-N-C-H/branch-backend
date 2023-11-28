@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, StreamableFile } from '@nestjs/common';
 import * as fs from 'fs';
+import { createReadStream } from 'fs';
 
 @Injectable()
 export class FileSystemService {
@@ -11,8 +12,7 @@ export class FileSystemService {
     createFile(file: Express.Multer.File, dirPath?: string) {
         if (dirPath && !this.fileExists(dirPath))
             fs.mkdirSync(dirPath, { recursive: true });
-        //const path = `${dirPath}/${file.originalname}`
-        fs.appendFileSync(file.originalname, file.buffer);
+        fs.appendFileSync(`${dirPath ?? ''}/${file.originalname}`, file.buffer);
     }
 
     deleteFile(path: string) {
@@ -22,10 +22,12 @@ export class FileSystemService {
     }
 
     fetchFile(path: string, fileName: string) {
-        const fullPath = `${path}/${fileName}`
+        const fullPath = `${path}/${fileName}`;
+        console.log(fullPath);
         if (!this.fileExists(fullPath))
             throw new Error(`There is no file at ${fullPath}`);
-        return new File([new Blob([fs.readFileSync(fullPath)])], fileName);
+        const file = createReadStream(fullPath);
+        return new StreamableFile(file);
     }
 
 }

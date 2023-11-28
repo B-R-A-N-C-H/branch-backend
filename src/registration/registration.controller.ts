@@ -87,7 +87,6 @@ export class RegistrationController {
     @Put("/documents")
     @UseInterceptors(FileInterceptor('file'))
     async uploadDocument(@UploadedFile() file: Express.Multer.File){
-        console.log(file)
         return this.registrationService.uploadDocument(file)
     }
 

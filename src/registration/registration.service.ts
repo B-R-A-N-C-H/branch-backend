@@ -1,228 +1,229 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
-import { Role } from "@prisma/client";
+import { Role } from '@prisma/client';
 import { JwtPayload } from 'src/auth/dto/auth.dto';
-import { Roles } from "src/auth/guards/protected.decorator";
+import { Roles } from 'src/auth/guards/protected.decorator';
 import { FileSystemService } from 'src/file-system/file-system.service';
 import { PrismaService } from 'src/utils/database/prisma.service';
 import {
-  ApproveRegistrationDto,
-  CreateRegistrationDto,
-  CreateRegistrationPeriodDto,
-  UpdateRegistrationDto,
-  RegistrationPeriodStatus,
-  UpdateRegistrationPeriodDto,
+    ApproveRegistrationDto,
+    CreateRegistrationDto,
+    CreateRegistrationPeriodDto,
+    UpdateRegistrationDto,
+    RegistrationPeriodStatus,
+    UpdateRegistrationPeriodDto,
 } from './dto/registration.dto';
 
 
 @Injectable()
 export class RegistrationService {
 
-  constructor(private prisma: PrismaService, private fileSystem: FileSystemService) {
-  }
-
-  async createRegistration(authUser: JwtPayload, dto: CreateRegistrationDto) {
-    //Needs Fixing
-    const currentDate = new Date();
-    const regPeriod = await this.prisma.registrationPeriod.findFirst({
-      where: {
-        starts: {
-          lte: currentDate,
-        },
-        ends: {
-          gte: currentDate,
-        },
-      },
-    });
-    if (!regPeriod)
-      throw new BadRequestException('Registration is not open!');
-    return this.prisma.registrationEntry.create({
-      data: {
-        ...dto,
-        secondaryEmergencyContactNumber: dto.secondaryEmergencyContactNumber ?? null,
-        memberId: authUser.sub.id,
-        registrationPeriodId: regPeriod.id,
-      },
-    });
-  }
-  async deleteRegistrationEntry(authUser: JwtPayload, regEntryId: string) {
-    if (authUser.sub.role === Role.ADMIN || authUser.sub.role === Role.PRINCIPAL) {
-      const regEntry = await this.getRegistrationEntry(regEntryId)
-      return this.prisma.registrationEntry.delete({
-        where: {
-          id: regEntryId
-        }
-      })
+    constructor(private prisma: PrismaService, private fileSystem: FileSystemService) {
     }
-    else if (authUser.sub.role === undefined) {
-      const regEntry = await this.getRegistrationEntry(regEntryId)
-      return this.prisma.registrationEntry.delete({
-        where: {
-          id: regEntryId,
-          memberId: authUser.sub.id
-        }
-      })
-    }
-    throw new ForbiddenException("You can't delete this entry")
-  }
 
-  async getRegistrationEntry(regEntryId: string) {
-    const registrationEntry = await this.prisma.registrationEntry.findUnique({
-      where: {
-        id: regEntryId
-      }
-    })
-    if (!registrationEntry)
-      throw new BadRequestException(`There is no registration entry with ID ${regEntryId}`);
-    return registrationEntry
-  }
-
-  async getAllRegistrationEntries() {
-    const registrationEntries = await this.prisma.registrationEntry.findMany();
-    if (!registrationEntries.length)
-      throw new BadRequestException("There are no registration entries")
-    return registrationEntries
-  }
-
-  async updateRegistrationEntry(regEntryId: string, dto: UpdateRegistrationDto) {
-    return this.getRegistrationEntry(regEntryId).then((regEntry) => {
-      return this.prisma.registrationEntry.update({
-        where: {
-          id: regEntry.id
-        },
-        data: dto
-      })
-    })
-  }
-
-  async approveRegistrationEntry(regEntryId: string, dto: ApproveRegistrationDto){
-    return this.prisma.registrationEntry.update({
-      where:{
-        id: regEntryId
-      },
-      data: dto
-    })
-  }
-
-  async createRegistrationPeriod(authUser: JwtPayload, dto: CreateRegistrationPeriodDto) {
-    const startDay = dto.starts;
-    startDay.setHours(0, 0, 0, 0);
-    const endDay = dto.starts;
-    endDay.setHours(0, 0, 0, 0);
-    const existingPeriod = await this.prisma.registrationPeriod.findFirst({
-      where: {
-        OR: [
-          {
-            starts: {
-              gte: endDay,
-              lte: startDay,
+    async createRegistration(authUser: JwtPayload, dto: CreateRegistrationDto) {
+        //Needs Fixing
+        const currentDate = new Date();
+        const regPeriod = await this.prisma.registrationPeriod.findFirst({
+            where: {
+                starts: {
+                    lte: currentDate,
+                },
+                ends: {
+                    gte: currentDate,
+                },
             },
-          },
-          {
-            ends: {
-              gte: startDay,
-              lte: endDay,
+        });
+        if (!regPeriod)
+            throw new BadRequestException('Registration is not open!');
+        return this.prisma.registrationEntry.create({
+            data: {
+                ...dto,
+                secondaryEmergencyContactNumber: dto.secondaryEmergencyContactNumber ?? null,
+                memberId: authUser.sub.id,
+                registrationPeriodId: regPeriod.id,
             },
-          },
-        ],
-      },
-    });
-    if (existingPeriod)
-      throw new ConflictException('A registration period in that range already exists!');
-
-    //Need to fix range detection
-    try {
-      return this.prisma.registrationPeriod.create({
-        data: dto,
-      });
-    } catch (error) {
-      throw new BadRequestException('Failed to create period. Details: ', error.message);
+        });
     }
-  }
 
-  async getAllRegistrationPeriods(status: RegistrationPeriodStatus = RegistrationPeriodStatus.ALL) {
-    const today = new Date();
+    async deleteRegistrationEntry(authUser: JwtPayload, regEntryId: string) {
+        if (authUser.sub.role === Role.ADMIN || authUser.sub.role === Role.PRINCIPAL) {
+            const regEntry = await this.getRegistrationEntry(regEntryId);
+            return this.prisma.registrationEntry.delete({
+                where: {
+                    id: regEntryId,
+                },
+            });
+        } else if (authUser.sub.role === undefined) {
+            const regEntry = await this.getRegistrationEntry(regEntryId);
+            return this.prisma.registrationEntry.delete({
+                where: {
+                    id: regEntryId,
+                    memberId: authUser.sub.id,
+                },
+            });
+        }
+        throw new ForbiddenException('You can\'t delete this entry');
+    }
 
-    const periods = await this.prisma.registrationPeriod.findMany({
-      where: status === RegistrationPeriodStatus.OPEN ? {
-        starts: {
-          gte: today,
-        },
-        ends: {
-          lte: today,
-        },
-      } : (status === RegistrationPeriodStatus.CLOSED ? {
-        starts: {
-          lt: today,
-        },
-        ends: {
-          lt: today,
-        },
-      } : undefined),
-    });
-    return periods;
-  }
+    async getRegistrationEntry(regEntryId: string) {
+        const registrationEntry = await this.prisma.registrationEntry.findUnique({
+            where: {
+                id: regEntryId,
+            },
+        });
+        if (!registrationEntry)
+            throw new BadRequestException(`There is no registration entry with ID ${regEntryId}`);
+        return registrationEntry;
+    }
 
-  async getRegistrationPeriod(regId: string) {
-    const period = await this.prisma.registrationPeriod.findUnique({
-      where: {
-        id: regId,
-      },
-    });
-    if (!period)
-      throw new BadRequestException(`There is no registration period with ID ${regId}`);
-    return period;
-  }
+    async getAllRegistrationEntries() {
+        const registrationEntries = await this.prisma.registrationEntry.findMany();
+        if (!registrationEntries.length)
+            throw new BadRequestException('There are no registration entries');
+        return registrationEntries;
+    }
 
-  async deleteRegistrationPeriod(regId: string) {
-    await this.getRegistrationPeriod(regId);
+    async updateRegistrationEntry(regEntryId: string, dto: UpdateRegistrationDto) {
+        return this.getRegistrationEntry(regEntryId).then((regEntry) => {
+            return this.prisma.registrationEntry.update({
+                where: {
+                    id: regEntry.id,
+                },
+                data: dto,
+            });
+        });
+    }
 
-    return this.prisma.registrationPeriod.delete({
-      where: {
-        id: regId,
-      },
-    });
-  }
+    async approveRegistrationEntry(regEntryId: string, dto: ApproveRegistrationDto) {
+        return this.prisma.registrationEntry.update({
+            where: {
+                id: regEntryId,
+            },
+            data: dto,
+        });
+    }
 
-  async updateRegistrationPeriod(regId: string, dto: UpdateRegistrationPeriodDto) {
-    return this.getRegistrationPeriod(regId)
-      .then(() => this.prisma.registrationPeriod.update({
-        where: {
-          id: regId,
-        },
-        data: dto,
-      }),
-      );
-  }
+    async createRegistrationPeriod(authUser: JwtPayload, dto: CreateRegistrationPeriodDto) {
+        const startDay = dto.starts;
+        startDay.setHours(0, 0, 0, 0);
+        const endDay = dto.starts;
+        endDay.setHours(0, 0, 0, 0);
+        const existingPeriod = await this.prisma.registrationPeriod.findFirst({
+            where: {
+                OR: [
+                    {
+                        starts: {
+                            gte: endDay,
+                            lte: startDay,
+                        },
+                    },
+                    {
+                        ends: {
+                            gte: startDay,
+                            lte: endDay,
+                        },
+                    },
+                ],
+            },
+        });
+        if (existingPeriod)
+            throw new ConflictException('A registration period in that range already exists!');
 
-  async uploadDocument(file: Express.Multer.File) {
-    const filePrefix = process.env.FILE_PREFIX
-    console.log(filePrefix)
-    const regDocument = await this.prisma.registrationDocument.upsert({
-      where:{
-        name: file.originalname
-      },
-      create:{
-        name: file.originalname
-      },
-      update:{
-        name: file.originalname
-      }
-    })
-    this.fileSystem.createFile(file, filePrefix)
+        //Need to fix range detection
+        try {
+            return this.prisma.registrationPeriod.create({
+                data: dto,
+            });
+        } catch (error) {
+            throw new BadRequestException('Failed to create period. Details: ', error.message);
+        }
+    }
 
-    return regDocument
-  }
+    async getAllRegistrationPeriods(status: RegistrationPeriodStatus = RegistrationPeriodStatus.ALL) {
+        const today = new Date();
 
-  async getDocument(fileId:string) {
-    const filePrefix = process.env.FILE_PREFIX
-    const regDocument = await this.prisma.registrationDocument.findUnique({
-      where:{
-        id: fileId
-      }
-    })
-    if (!regDocument)
-      throw new BadRequestException(`There is no registration period with ID ${fileId}`);
-    //const path = `${filePrefix}/${regDocument.name}`
-    return this.fileSystem.fetchFile(filePrefix, regDocument.name)
-  }
+        const periods = await this.prisma.registrationPeriod.findMany({
+            where: status === RegistrationPeriodStatus.OPEN ? {
+                starts: {
+                    gte: today,
+                },
+                ends: {
+                    lte: today,
+                },
+            } : (status === RegistrationPeriodStatus.CLOSED ? {
+                starts: {
+                    lt: today,
+                },
+                ends: {
+                    lt: today,
+                },
+            } : undefined),
+        });
+        return periods;
+    }
+
+    async getRegistrationPeriod(regId: string) {
+        const period = await this.prisma.registrationPeriod.findUnique({
+            where: {
+                id: regId,
+            },
+        });
+        if (!period)
+            throw new BadRequestException(`There is no registration period with ID ${regId}`);
+        return period;
+    }
+
+    async deleteRegistrationPeriod(regId: string) {
+        await this.getRegistrationPeriod(regId);
+
+        return this.prisma.registrationPeriod.delete({
+            where: {
+                id: regId,
+            },
+        });
+    }
+
+    async updateRegistrationPeriod(regId: string, dto: UpdateRegistrationPeriodDto) {
+        return this.getRegistrationPeriod(regId)
+            .then(() => this.prisma.registrationPeriod.update({
+                    where: {
+                        id: regId,
+                    },
+                    data: dto,
+                }),
+            );
+    }
+
+    async uploadDocument(file: Express.Multer.File) {
+        const filePrefix = process.env.FILE_PREFIX;
+        const regDocument = await this.prisma.registrationDocument.upsert({
+            where: {
+                name: file.originalname,
+            },
+            create: {
+                name: file.originalname,
+                mimeType: file.mimetype,
+            },
+            update: {
+                name: file.originalname,
+                mimeType: file.mimetype,
+            },
+        });
+        this.fileSystem.createFile(file, filePrefix);
+
+        return regDocument;
+    }
+
+    async getDocument(fileId: string) {
+        const filePrefix = process.env.FILE_PREFIX;
+        const regDocument = await this.prisma.registrationDocument.findUnique({
+            where: {
+                id: fileId,
+            },
+        });
+
+        if (!regDocument)
+            throw new BadRequestException(`There is no registration period with ID ${fileId}`);
+        return this.fileSystem.fetchFile(filePrefix, regDocument.name);
+    }
 }
