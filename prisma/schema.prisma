@@ -116,6 +116,7 @@ enum AnnouncementLevel {
 model Announcement {
   id      String            @id @default(cuid())
   level   AnnouncementLevel @default(GLOBAL)
+  title   String
   content String
 
   commentsEnabled Boolean               @default(true)

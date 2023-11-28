@@ -10,7 +10,7 @@ import {
     CreateEventDto,
     UpdateEventDto,
     CreateAnnouncementCommentDto,
-    CreateAnnouncementDto,
+    CreateAnnouncementDto, UpdateAnnouncementDto,
 } from './dto/communication.dto';
 import { JwtPayload } from '../auth/dto/auth.dto';
 import { Member, Role, Student } from '@prisma/client';
@@ -152,7 +152,7 @@ export class CommunicationService {
         });
     }
 
-    async updateAnnouncement(announcementId: string, dto: any) {
+    async updateAnnouncement(announcementId: string, dto: UpdateAnnouncementDto) {
         const announcement = await this.prisma.announcement.findUnique({
             where: {
                 id: announcementId,
