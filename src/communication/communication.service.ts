@@ -108,9 +108,9 @@ export class CommunicationService {
         const announcement = await this.prisma.announcement.findUnique({
             where: {
                 id: announcementId,
-                level: {
+                level: user.sub.role === null ? {
                     in: memberAnnouncementLevels,
-                },
+                } : undefined,
             },
         });
 
