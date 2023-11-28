@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, ForbiddenException, Injectable 
 import { Role } from "@prisma/client";
 import { JwtPayload } from 'src/auth/dto/auth.dto';
 import { Roles } from "src/auth/guards/protected.decorator";
+import { FileSystemService } from 'src/file-system/file-system.service';
 import { PrismaService } from 'src/utils/database/prisma.service';
 import {
   ApproveRegistrationDto,
@@ -16,7 +17,7 @@ import {
 @Injectable()
 export class RegistrationService {
 
-  constructor(private prisma: PrismaService) {
+  constructor(private prisma: PrismaService, private fileSystem: FileSystemService) {
   }
 
   async createRegistration(authUser: JwtPayload, dto: CreateRegistrationDto) {
@@ -194,11 +195,34 @@ export class RegistrationService {
   }
 
   async uploadDocument(file: Express.Multer.File) {
-    /*const existingDoc = this.prisma.registrationDocument.findMany({
+    const filePrefix = process.env.FILE_PREFIX
+    console.log(filePrefix)
+    const regDocument = await this.prisma.registrationDocument.upsert({
       where:{
-
+        name: file.originalname
+      },
+      create:{
+        name: file.originalname
+      },
+      update:{
+        name: file.originalname
       }
-    })*/
-    return "implement this"
+    })
+    this.fileSystem.createFile(file, filePrefix)
+
+    return regDocument
+  }
+
+  async getDocument(fileId:string) {
+    const filePrefix = process.env.FILE_PREFIX
+    const regDocument = await this.prisma.registrationDocument.findUnique({
+      where:{
+        id: fileId
+      }
+    })
+    if (!regDocument)
+      throw new BadRequestException(`There is no registration period with ID ${fileId}`);
+    //const path = `${filePrefix}/${regDocument.name}`
+    return this.fileSystem.fetchFile(filePrefix, regDocument.name)
   }
 }

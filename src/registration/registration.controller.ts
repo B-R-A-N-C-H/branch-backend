@@ -84,10 +84,17 @@ export class RegistrationController {
     }
 
     //@Protected(Role.ADMIN, Role.PRINCIPAL)
-    @Put("documents")
+    @Put("/documents")
     @UseInterceptors(FileInterceptor('file'))
     async uploadDocument(@UploadedFile() file: Express.Multer.File){
+        console.log(file)
         return this.registrationService.uploadDocument(file)
+    }
+
+    //@Protected()
+    @Get("/documents/:id")
+    async getDocument(@Param('id') id: string){
+        return this.registrationService.getDocument(id)
     }
     
 }

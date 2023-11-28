@@ -11,7 +11,8 @@ export class FileSystemService {
     createFile(file: Express.Multer.File, dirPath?: string) {
         if (dirPath && !this.fileExists(dirPath))
             fs.mkdirSync(dirPath, { recursive: true });
-        fs.appendFileSync(file.filename, file.buffer);
+        //const path = `${dirPath}/${file.originalname}`
+        fs.appendFileSync(file.originalname, file.buffer);
     }
 
     deleteFile(path: string) {
