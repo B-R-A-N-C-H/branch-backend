@@ -47,10 +47,6 @@ export class CreateAnnouncementCommentDto {
 
   @IsString()
   @IsNotEmpty()
-  announcementId: string;
-
-  @IsString()
-  @IsNotEmpty()
   commenterId: string;
 
   @IsString()

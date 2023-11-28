@@ -51,14 +51,14 @@ export class CommunicationController {
 
     @Protected()
     @Delete('announcements/:id/comments/:commentId')
-    async deleteAnnouncementComment(@Param('id') id: string, @Param('commentId') commentId: string) {
-        return this.communicationService.deleteAnnouncementComment(id, commentId);
+    async deleteAnnouncementComment(@AuthenticatedUser() authUser: JwtPayload, @Param('commentId') commentId: string) {
+        return this.communicationService.deleteAnnouncementComment(authUser, commentId);
     }
 
     @Protected()
     @Post('announcements/:id/comments')
-    async createAnnouncementComment(@Param('id') id: string, @Body() dto: CreateAnnouncementCommentDto) {
-        return this.communicationService.createAnnouncementComment(id, dto);
+    async createAnnouncementComment(@AuthenticatedUser() authUser: JwtPayload, @Param('id') id: string, @Body() dto: CreateAnnouncementCommentDto) {
+        return this.communicationService.createAnnouncementComment(authUser, id, dto);
     }
 
     @Protected(Role.HEAD_TEACHER, Role.TEACHER, Role.PRINCIPAL, Role.ADMIN)

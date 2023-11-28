@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    ForbiddenException,
+    Injectable,
+    NotFoundException,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../utils/database/prisma.service';
 import {
     CreateEventDto,
@@ -7,10 +13,12 @@ import {
     CreateAnnouncementDto,
 } from './dto/communication.dto';
 import { JwtPayload } from '../auth/dto/auth.dto';
+import { Member, Role, Student } from '@prisma/client';
+import { MemberService } from '../member/member.service';
 
 @Injectable()
 export class CommunicationService {
-    constructor(private prisma: PrismaService) {
+    constructor(private prisma: PrismaService, private memberService: MemberService) {
     }
 
     async updateEvent(eventId: string, dto: UpdateEventDto) {
@@ -78,35 +86,45 @@ export class CommunicationService {
         return this.prisma.event.findMany();
     }
 
-    async deleteAnnouncementComment(announcementId: string, commentId: string) {
+    async deleteAnnouncementComment(user: JwtPayload, commentId: string) {
+        const comment = await this.prisma.announcementComment.findUnique({
+            where: { id: commentId },
+            include: { announcement: true },
+        });
+
+        if (!comment)
+            throw new NotFoundException(`There is no such comment with the ID: ${commentId}`);
+
+        if (!this.memberService.memberHasRole(user) && comment.commenterId !== user.sub.id)
+            throw new ForbiddenException('You cannot delete this comment!');
+
+        return this.prisma.announcementComment.delete({
+            where: { id: commentId },
+        });
+    }
+
+    async createAnnouncementComment(user: JwtPayload, announcementId: string, dto: CreateAnnouncementCommentDto) {
+        const memberAnnouncementLevels = await this.fetchMemberAnnouncementLevels(user.sub.id);
         const announcement = await this.prisma.announcement.findUnique({
             where: {
                 id: announcementId,
-                comments: {
-                    some: {
-                        id: commentId,
-                    },
+                level: {
+                    in: memberAnnouncementLevels,
                 },
             },
         });
 
-        if (!announcement) {
-            throw new NotFoundException('Announcement not found');
-        }
+        if (!announcement)
+            throw new ForbiddenException(`You can't create a comment for such an announcement!`);
 
-        return this.prisma.announcement.delete({
-            where: {
-                id: commentId,
-            },
-        });
-    }
+        if (!announcement.commentsEnabled)
+            throw new ForbiddenException('Comments are disabled for this announcement!');
 
-    async createAnnouncementComment(id: string, dto: CreateAnnouncementCommentDto) {
         try {
             return await this.prisma.announcementComment.create({
                 data: {
                     content: dto.content,
-                    announcementId: dto.announcementId,
+                    announcementId: announcementId,
                     commenterId: dto.commenterId,
                     parentCommentId: dto.parentCommentId ?? null,
                 },
@@ -195,38 +213,54 @@ export class CommunicationService {
 
         // Apply filtering only for regular users (non-admins)
         if (member.role === null) {
-            const childGradeLevels = member.children.map(child => parseInt(child.gradeLevel));
+            const announcementLevels = this.generateMemberAnnouncementLevels(member);
 
-            if (childGradeLevels.length === 0) {
+            if (announcementLevels.length === 0) {
                 // Users with no registered students see only global announcements
                 whereQuery = { level: 'GLOBAL' };
             } else {
-                const childAnnouncementLevels = [...new Set(
-                    childGradeLevels
-                        .filter(level => [1, 2, 3].includes(level))
-                        .map(level => {
-                            switch (level) {
-                                case 1:
-                                    return 'ONE';
-                                case 2:
-                                    return 'TWO';
-                                case 3:
-                                    return 'THREE';
-                                default:
-                                    return 'GLOBAL';
-                            }
-                        }),
-                )];
-
                 whereQuery = {
                     level: {
-                        in: childAnnouncementLevels,
+                        in: announcementLevels,
                     },
                 };
             }
         }
 
         return whereQuery;
+    }
+
+    private async fetchMemberAnnouncementLevels(memberId: string) {
+        const member = await this.prisma.member.findUnique({
+            where: {
+                id: memberId,
+            },
+            include: { children: true },
+        });
+
+        if (!member)
+            throw new UnauthorizedException('You don\'t have a valid account!');
+        return this.generateMemberAnnouncementLevels(member);
+    }
+
+    private generateMemberAnnouncementLevels(member: Member & { children: Student[] }) {
+        const childGradeLevels = member.children.map(child => parseInt(child.gradeLevel));
+        return [...new Set(
+            childGradeLevels
+                .filter(level => [1, 2, 3].includes(level))
+                .map(level => {
+                    switch (level) {
+                        case 1:
+                            return 'ONE';
+                        case 2:
+                            return 'TWO';
+                        case 3:
+                            return 'THREE';
+                        default:
+                            return 'GLOBAL';
+                    }
+                }),
+        )];
     }
 
 }
