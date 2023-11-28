@@ -96,4 +96,8 @@ export class RegistrationController {
         return this.registrationService.getDocument(id)
     }
     
+    @Delete("/documents/:id")
+    async deleteDocument(@Param("id") id: string){
+        return this.registrationService.deleteDocument(id)
+    }
 }

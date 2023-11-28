@@ -216,14 +216,30 @@ export class RegistrationService {
 
     async getDocument(fileId: string) {
         const filePrefix = process.env.FILE_PREFIX;
-        const regDocument = await this.prisma.registrationDocument.findUnique({
+        const regDocument = await this.getDocumentQuery(fileId)
+        if (!regDocument)
+            throw new BadRequestException(`There is no registration period with ID ${fileId}`);
+        return this.fileSystem.fetchFile(filePrefix, regDocument.name);
+    }
+
+    async getDocumentQuery(fileId: string) {
+      return this.prisma.registrationDocument.findUnique({
+        where: {
+            id: fileId,
+        },
+    });
+    }
+
+    async deleteDocument(fileId: string) {
+      const filePrefix = process.env.FILE_PREFIX
+      const regDocument = await this.getDocumentQuery(fileId)
+      if (!regDocument)
+            throw new BadRequestException(`There is no registration period with ID ${fileId}`);
+      this.fileSystem.deleteFile(`${filePrefix}/${regDocument.name}`)
+      return this.prisma.registrationDocument.delete({
             where: {
                 id: fileId,
             },
         });
-
-        if (!regDocument)
-            throw new BadRequestException(`There is no registration period with ID ${fileId}`);
-        return this.fileSystem.fetchFile(filePrefix, regDocument.name);
     }
 }
