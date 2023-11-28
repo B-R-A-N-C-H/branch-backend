@@ -74,6 +74,11 @@ export class CommunicationService {
     const announcement = await this.prisma.announcement.findUnique({
       where: {
         id: announcementId,
+        comments: {
+          some: {
+            id: commentId,
+          }
+        }
       },
     });
 
@@ -107,7 +112,7 @@ export class CommunicationService {
   async deleteAnnouncement(announcementId: string) {
     const announcement = await this.prisma.announcement.findUnique({
       where: {
-        id: announcementId,
+        id: announcementId
       },
     });
 
