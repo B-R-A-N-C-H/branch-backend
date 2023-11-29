@@ -5,6 +5,7 @@ import { AuthModule } from "./auth/auth.module";
 import configuration from "./utils/config/configuration";
 import { PrismaService } from "./utils/database/prisma.service";
 import { StudentManagementModule } from './student-management/student-management.module';
+import { FileSystemService } from './file-system/file-system.service';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -15,7 +16,8 @@ import { StudentManagementModule } from './student-management/student-management
     AuthModule,
     StudentManagementModule
   ],
-  providers: [PrismaService],
+  providers: [PrismaService, FileSystemService]
+
 })
 
 export class AppModule {
