@@ -1,22 +1,24 @@
 import {
-    IsBoolean,
+    IsBoolean, IsDate,
     IsDateString, IsEnum,
     IsNotEmpty,
     IsOptional,
     IsString,
 } from 'class-validator';
 import { AnnouncementLevel } from '@prisma/client';
+import { Type } from 'class-transformer';
 
 export class UpdateEventDto {
-    @IsString() @IsNotEmpty()
+    @IsString()
+    @IsOptional()
     name: string;
 
     @IsOptional()
-    @IsDateString()
+    @IsDate() @Type(() => Date)
     readonly starts?: Date;
 
     @IsOptional()
-    @IsDateString()
+    @IsDate() @Type(() => Date)
     readonly ends?: Date;
 }
 
@@ -24,10 +26,12 @@ export class CreateEventDto {
     @IsString() @IsNotEmpty()
     name: string;
 
-    @IsDateString()
+    @IsNotEmpty()
+    @IsDate() @Type(() => Date)
     starts: Date;
 
-    @IsDateString()
+    @IsNotEmpty()
+    @IsDate() @Type(() => Date)
     ends: Date;
 }
 
