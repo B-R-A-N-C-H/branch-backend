@@ -1,4 +1,5 @@
 import {
+    IsBoolean,
     IsDateString, IsEnum,
     IsNotEmpty,
     IsOptional,
@@ -46,6 +47,10 @@ export class CreateAnnouncementDto {
     @IsEnum(AnnouncementLevel)
     @IsOptional()
     level?: AnnouncementLevel;
+
+    @IsBoolean()
+    @IsOptional()
+    commentsEnabled?: boolean
 }
 
 export class CreateAnnouncementCommentDto {
@@ -74,4 +79,8 @@ export class UpdateAnnouncementDto {
     @IsEnum(AnnouncementLevel)
     @IsOptional()
     level?: AnnouncementLevel;
+
+    @IsBoolean()
+    @IsOptional()
+    commentsEnabled?: boolean
 }
