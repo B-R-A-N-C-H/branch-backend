@@ -91,7 +91,7 @@ model Student {
 
   firstName  String
   lastName   String
-  gradeLevel String
+  gradeLevel Int
 
   streetName                      String
   city                            String

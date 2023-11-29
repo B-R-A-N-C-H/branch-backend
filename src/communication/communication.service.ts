@@ -13,7 +13,7 @@ import {
     CreateAnnouncementDto, UpdateAnnouncementDto,
 } from './dto/communication.dto';
 import { JwtPayload } from '../auth/dto/auth.dto';
-import { AnnouncementLevel, Member, Role, Student } from '@prisma/client';
+import { AnnouncementLevel, Member, Student } from '@prisma/client';
 import { MemberService } from '../member/member.service';
 
 @Injectable()
@@ -255,7 +255,7 @@ export class CommunicationService {
     }
 
     private generateMemberAnnouncementLevels(member: Member & { children: Student[] }) {
-        const childGradeLevels = member.children.map(child => parseInt(child.gradeLevel));
+        const childGradeLevels = member.children.map(child => child.gradeLevel);
         return [...new Set(
             childGradeLevels
                 .filter(level => [1, 2, 3].includes(level))

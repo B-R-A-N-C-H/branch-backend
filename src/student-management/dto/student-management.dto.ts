@@ -1,19 +1,18 @@
-import { IsDateString, IsEmail, IsInt, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsDateString, IsEmail, IsInt, IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator';
 import { Member } from '@prisma/client';
 
 export class UpdateStudentDto {
-  @IsString() @IsNotEmpty() firstName: string
-  @IsString() @IsNotEmpty() lastName: string
-  @IsString() @IsNotEmpty() gradeLevel: string
+    @IsString() @IsNotEmpty() firstName: string;
+    @IsString() @IsNotEmpty() lastName: string;
 
-  @IsString() @IsNotEmpty() streetName: string
-  @IsString() @IsNotEmpty() city: string
-  @IsString() @IsNotEmpty() parish: string
-  @IsString() @IsNotEmpty() emergencyContactNumber: string
-  @IsString() @IsNotEmpty() secondaryEmergencyContactNumber: string
+    @IsNumber()
+    @Min(1) @Max(3)
+    @IsNotEmpty()
+    gradeLevel: number;
 
-  // @IsString() @IsNotEmpty() parentId: string
-  // @IsNotEmpty()parent: Member
-
-  @IsDateString() updatedAt:  Date
+    @IsString() @IsNotEmpty() streetName: string;
+    @IsString() @IsNotEmpty() city: string;
+    @IsString() @IsNotEmpty() parish: string;
+    @IsString() @IsNotEmpty() emergencyContactNumber: string;
+    @IsString() @IsNotEmpty() secondaryEmergencyContactNumber: string;
 }

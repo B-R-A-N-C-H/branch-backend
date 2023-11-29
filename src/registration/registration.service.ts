@@ -106,7 +106,7 @@ export class RegistrationService {
                     data: {
                         firstName: entry.childFirstName,
                         lastName: entry.childLastName,
-                        gradeLevel: entry.gradeLevel.toString(),
+                        gradeLevel: entry.gradeLevel,
                         streetName: entry.streetName,
                         city: entry.city,
                         parish: entry.parish,

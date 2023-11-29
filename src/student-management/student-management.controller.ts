@@ -24,7 +24,7 @@ export class StudentManagementController {
 
     @Protected(Role.ADMIN, Role.PRINCIPAL, Role.HEAD_TEACHER)
     @Get()
-    async UpdateStudent(@Param(':id') id: string, updateStudent: UpdateStudentDto) {
+    async UpdateStudent(@Param(':id') id: string, @Body() updateStudent: UpdateStudentDto) {
         return this.StudentManagementService.updateStudent(id, updateStudent);
     }
 
