@@ -55,8 +55,8 @@ model RegistrationEntry {
   id       String   @id @default(cuid())
   approved Boolean? // If the field is null the entry hasn't been reviewed yet.
 
-  memberId String
   by       Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId String
 
   gradeLevel       Int
   childFirstName   String
@@ -67,19 +67,20 @@ model RegistrationEntry {
   city       String
   parish     String
 
-  emergencyContactNumber           String
-  secondaryEmergencyConctactNumber String
+  emergencyContactNumber          String
+  secondaryEmergencyContactNumber String
 
-  registrationPeriodId String
   for                  RegistrationPeriod @relation(fields: [registrationPeriodId], references: [id], onDelete: Cascade)
+  registrationPeriodId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model RegistrationDocument {
-  id   String @id @default(cuid())
-  name String @unique
+  id       String @id @default(cuid())
+  name     String @unique
+  mimeType String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -115,6 +116,7 @@ enum AnnouncementLevel {
 model Announcement {
   id      String            @id @default(cuid())
   level   AnnouncementLevel @default(GLOBAL)
+  title   String
   content String
 
   commentsEnabled Boolean               @default(true)
@@ -138,7 +140,7 @@ model AnnouncementComment {
   announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
 
   commenterId String
-  commenter   Member @relation(fields: [commenterId], references: [id])
+  commenter   Member @relation(fields: [commenterId], references: [id], onDelete: Cascade)
 
   content String
 
