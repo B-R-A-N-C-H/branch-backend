@@ -116,6 +116,7 @@ enum AnnouncementLevel {
 model Announcement {
   id      String            @id @default(cuid())
   level   AnnouncementLevel @default(GLOBAL)
+  title   String
   content String
 
   commentsEnabled Boolean               @default(true)
@@ -139,7 +140,7 @@ model AnnouncementComment {
   announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
 
   commenterId String
-  commenter   Member @relation(fields: [commenterId], references: [id])
+  commenter   Member @relation(fields: [commenterId], references: [id], onDelete: Cascade)
 
   content String
 
