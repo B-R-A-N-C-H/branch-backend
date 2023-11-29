@@ -7,74 +7,66 @@ import { UpdateStudentDto } from './dto/student-management.dto';
 @Injectable()
 export class StudentManagementService {
 
-  constructor(private Prisma: PrismaService) {
-
-  }
-
-  async GetAllStudents() {
-    return this.Prisma.student.findMany();
-  }
-
-  async GetStudentById(studentId: string) {
-    const student = await this.Prisma.student.findUnique( {
-      where: {
-        id : studentId
-      }
-    })
-
-    if (student) {
-      return student;
-    }
-    else {
-      throw new NotFoundException("Student not found!");
-    }
-  }
-
-
-  async DeleteStudent(studentId: string) {
-    const student = await this.Prisma.student.findUnique({
-      where: {
-        id: studentId
-      }
-    });
-
-    if (!studentId) {
-      throw new NotFoundException('student not found');
+    constructor(private Prisma: PrismaService) {
     }
 
-    return this.Prisma.student.delete( {
-      where: {
-        id : studentId
-      }
-    });
+    async getAllStudents() {
+        return this.Prisma.student.findMany();
+    }
 
-  }
+    async getStudentById(studentId: string) {
+        const student = await this.Prisma.student.findUnique({
+            where: {
+                id: studentId,
+            },
+        });
 
+        if (!student)
+            throw new NotFoundException(`There is no student with ID: ${studentId}`);
 
-
-
-  async UpdateStudent(studentId: string, dataTransObj: UpdateStudentDto) {
-    const student = await this.Prisma.student.findUnique({
-      where: {
-        id: studentId
-      }
-    });
-
-    if (!studentId) {
-      throw new NotFoundException('student not found');
+        return student
     }
 
 
-    return this.Prisma.student.update({
-      where: {
-        id: studentId
-      },
-      data: dataTransObj
-    })
-  }
+    async deleteStudent(studentId: string) {
+        const student = await this.Prisma.student.findUnique({
+            where: {
+                id: studentId,
+            },
+        });
+
+        if (!student)
+            throw new NotFoundException(`There is no student with ID: ${studentId}`);
 
 
+        return this.Prisma.student.delete({
+            where: {
+                id: studentId,
+            },
+        });
 
+    }
+
+
+    async updateStudent(studentId: string, dataTransObj: UpdateStudentDto) {
+        const student = await this.Prisma.student.findUnique({
+            where: {
+                id: studentId,
+            },
+        });
+
+        if (!student) {
+            throw new NotFoundException('student not found');
+        }
+
+
+        return this.Prisma.student.update({
+            where: {
+                id: studentId,
+            },
+            data: dataTransObj,
+        });
+    }
 }
 
 

@@ -55,7 +55,7 @@ export class UpdateRegistrationDto {
     @IsOptional() @IsString() @IsPhoneNumber("JM") secondaryEmergencyContactNumber?: string
 }
 
-export class ApproveRegistrationDto {
+export class ReviewRegistrationDto {
     @IsBoolean() @IsNotEmpty() @Allow() approved: boolean
 }
 

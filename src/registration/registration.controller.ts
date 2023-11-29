@@ -19,7 +19,7 @@ import Protected from 'src/auth/guards/protected.decorator';
 import {
     CreateRegistrationDto,
     CreateRegistrationPeriodDto, FetchRegistrationPeriodsQueryDto,
-    UpdateRegistrationPeriodDto, ApproveRegistrationDto, UpdateRegistrationDto,
+    UpdateRegistrationPeriodDto, ReviewRegistrationDto, UpdateRegistrationDto,
 } from './dto/registration.dto';
 import { RegistrationService } from './registration.service';
 
@@ -61,8 +61,8 @@ export class RegistrationController {
 
     @Protected(Role.ADMIN, Role.PRINCIPAL, Role.TEACHER)
     @Post('/entries/:id/review')
-    async approveRegistration(@Param('id') id: string, @Body() dto: ApproveRegistrationDto) {
-        return this.registrationService.approveRegistrationEntry(id, dto);
+    async reviewRegistration(@Param('id') id: string, @Body() dto: ReviewRegistrationDto) {
+        return this.registrationService.reviewRegistrationEntry(id, dto);
     }
 
 
