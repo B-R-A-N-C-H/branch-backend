@@ -89,9 +89,10 @@ model RegistrationDocument {
 model Student {
   id String @id @default(cuid())
 
-  firstName  String
-  lastName   String
-  gradeLevel Int
+  firstName        String
+  lastName         String
+  gradeLevel       Int
+  childDateOfBirth DateTime
 
   streetName                      String
   city                            String

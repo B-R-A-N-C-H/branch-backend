@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
 import { StudentManagementService } from './student-management.service';
 import { UpdateStudentDto } from './dto/student-management.dto';
 import Protected from '../auth/guards/protected.decorator';
@@ -23,13 +23,13 @@ export class StudentManagementController {
     }
 
     @Protected(Role.ADMIN, Role.PRINCIPAL, Role.HEAD_TEACHER)
-    @Get()
+    @Patch(':id')
     async UpdateStudent(@Param(':id') id: string, @Body() updateStudent: UpdateStudentDto) {
         return this.StudentManagementService.updateStudent(id, updateStudent);
     }
 
     @Protected(Role.ADMIN, Role.PRINCIPAL, Role.HEAD_TEACHER)
-    @Get(':id')
+    @Delete(':id')
     async DeleteStudent(@Param('id') id: string) {
         return this.StudentManagementService.deleteStudent(id);
     }

@@ -108,6 +108,7 @@ export class RegistrationService {
                         lastName: entry.childLastName,
                         gradeLevel: entry.gradeLevel,
                         streetName: entry.streetName,
+                        childDateOfBirth: entry.childDateOfBirth,
                         city: entry.city,
                         parish: entry.parish,
                         emergencyContactNumber: entry.emergencyContactNumber,
