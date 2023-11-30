@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../utils/database/prisma.service';
 import { Student } from '@prisma/client';
 import { UpdateStudentDto } from './dto/student-management.dto';
+import { JwtPayload } from '../auth/dto/auth.dto';
 
 
 @Injectable()
@@ -10,14 +11,19 @@ export class StudentManagementService {
     constructor(private prisma: PrismaService) {
     }
 
-    async getAllStudents() {
-        return this.prisma.student.findMany();
+    async getAllStudents(user: JwtPayload) {
+        return this.prisma.student.findMany({
+            where: user.sub.role === null ? {
+                parentId: user.sub.id
+            } : undefined
+        });
     }
 
-    async getStudentById(studentId: string) {
+    async getStudentById(studentId: string, user: JwtPayload) {
         const student = await this.prisma.student.findUnique({
             where: {
                 id: studentId,
+                parentId: user.sub.id
             },
             include: {
                 parent: true,
