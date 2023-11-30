@@ -7,29 +7,32 @@ import { UpdateStudentDto } from './dto/student-management.dto';
 @Injectable()
 export class StudentManagementService {
 
-    constructor(private Prisma: PrismaService) {
+    constructor(private prisma: PrismaService) {
     }
 
     async getAllStudents() {
-        return this.Prisma.student.findMany();
+        return this.prisma.student.findMany();
     }
 
     async getStudentById(studentId: string) {
-        const student = await this.Prisma.student.findUnique({
+        const student = await this.prisma.student.findUnique({
             where: {
                 id: studentId,
+            },
+            include: {
+                parent: true,
             },
         });
 
         if (!student)
             throw new NotFoundException(`There is no student with ID: ${studentId}`);
 
-        return student
+        return student;
     }
 
 
     async deleteStudent(studentId: string) {
-        const student = await this.Prisma.student.findUnique({
+        const student = await this.prisma.student.findUnique({
             where: {
                 id: studentId,
             },
@@ -39,7 +42,7 @@ export class StudentManagementService {
             throw new NotFoundException(`There is no student with ID: ${studentId}`);
 
 
-        return this.Prisma.student.delete({
+        return this.prisma.student.delete({
             where: {
                 id: studentId,
             },
@@ -49,7 +52,7 @@ export class StudentManagementService {
 
 
     async updateStudent(studentId: string, dataTransObj: UpdateStudentDto) {
-        const student = await this.Prisma.student.findUnique({
+        const student = await this.prisma.student.findUnique({
             where: {
                 id: studentId,
             },
@@ -60,7 +63,7 @@ export class StudentManagementService {
         }
 
 
-        return this.Prisma.student.update({
+        return this.prisma.student.update({
             where: {
                 id: studentId,
             },
