@@ -4,7 +4,7 @@ import { JwtPayload } from 'src/auth/dto/auth.dto';
 import { FileSystemService } from 'src/file-system/file-system.service';
 import { PrismaService } from 'src/utils/database/prisma.service';
 import {
-    ApproveRegistrationDto,
+    ReviewRegistrationDto,
     CreateRegistrationDto,
     CreateRegistrationPeriodDto,
     RegistrationPeriodStatus,
@@ -16,7 +16,10 @@ import {
 @Injectable()
 export class RegistrationService {
 
-    constructor(private prisma: PrismaService, private fileSystem: FileSystemService) {
+    constructor(
+        private prisma: PrismaService,
+        private fileSystem: FileSystemService,
+    ) {
     }
 
     async createRegistration(authUser: JwtPayload, dto: CreateRegistrationDto) {
@@ -91,12 +94,31 @@ export class RegistrationService {
         });
     }
 
-    async approveRegistrationEntry(regEntryId: string, dto: ApproveRegistrationDto) {
+    async reviewRegistrationEntry(regEntryId: string, dto: ReviewRegistrationDto) {
         return this.prisma.registrationEntry.update({
             where: {
                 id: regEntryId,
             },
             data: dto,
+        }).then(async (entry) => {
+            if (entry.approved) {
+                await this.prisma.student.create({
+                    data: {
+                        firstName: entry.childFirstName,
+                        lastName: entry.childLastName,
+                        gradeLevel: entry.gradeLevel,
+                        streetName: entry.streetName,
+                        childDateOfBirth: entry.childDateOfBirth,
+                        city: entry.city,
+                        parish: entry.parish,
+                        emergencyContactNumber: entry.emergencyContactNumber,
+                        secondaryEmergencyContactNumber: entry.secondaryEmergencyContactNumber,
+                        parentId: entry.memberId,
+                    },
+                });
+            }
+
+            return entry;
         });
     }
 
